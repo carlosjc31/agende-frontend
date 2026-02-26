@@ -16,7 +16,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -34,6 +34,8 @@ export default function LoginScreen({ navigation }) {
     setIsLoading(true);
 
     try {
+      console.log('Tentando login com:', email);
+
       const result = await signIn(email, password);
 
       if (result.success) {

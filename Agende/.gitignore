@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Ignorar o arquivo de configuração do API
+src/services/api.js

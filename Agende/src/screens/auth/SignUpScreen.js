@@ -15,7 +15,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function SignUpScreen({ navigation }) {
   const [fullName, setFullName] = useState('');
@@ -102,8 +102,8 @@ export default function SignUpScreen({ navigation }) {
 
     try {
       // Converter data para formato ISO
-      const [dia, mes, ano] = dataNascimento.split('/');
-      const dataISO = `${ano}-${mes}-${dia}`;
+      const partesData = dataNascimento.split('/');
+      const dataFormatadaParaJava = `${partesData[2]}-${partesData[1]}-${partesData[0]}`;
 
       const result = await signUp({
         nomeCompleto: fullName,
@@ -113,6 +113,7 @@ export default function SignUpScreen({ navigation }) {
         dataNascimento: dataISO,
         telefone: phone,
       });
+
 
       if (result.success) {
         Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
