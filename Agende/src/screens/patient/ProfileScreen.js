@@ -12,8 +12,10 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ProfileScreen({ navigation }) {
+  const { signOut } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
 
@@ -31,77 +33,77 @@ export default function ProfileScreen({ navigation }) {
     {
       title: 'Minha Conta',
       items: [
-        { 
-          icon: 'person-outline', 
-          label: 'Dados Pessoais', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'person-outline',
+          label: 'Dados Pessoais',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'card-outline', 
-          label: 'Cartões e Pagamentos', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'card-outline',
+          label: 'Cartões e Pagamentos',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'medkit-outline', 
-          label: 'Plano de Saúde', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'medkit-outline',
+          label: 'Plano de Saúde',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'document-text-outline', 
-          label: 'Documentos Médicos', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'document-text-outline',
+          label: 'Documentos Médicos',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
       ],
     },
     {
       title: 'Histórico Médico',
       items: [
-        { 
-          icon: 'flask-outline', 
-          label: 'Exames', 
+        {
+          icon: 'flask-outline',
+          label: 'Exames',
           badge: '3',
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'receipt-outline', 
-          label: 'Receitas Médicas', 
+        {
+          icon: 'receipt-outline',
+          label: 'Receitas Médicas',
           badge: '2',
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'clipboard-outline', 
-          label: 'Prontuários', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'clipboard-outline',
+          label: 'Prontuários',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'trending-up-outline', 
-          label: 'Indicadores de Saúde', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'trending-up-outline',
+          label: 'Indicadores de Saúde',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
       ],
     },
     {
       title: 'Suporte',
       items: [
-        { 
-          icon: 'help-circle-outline', 
-          label: 'Central de Ajuda', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'help-circle-outline',
+          label: 'Central de Ajuda',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'chatbubble-outline', 
-          label: 'Fale Conosco', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'chatbubble-outline',
+          label: 'Fale Conosco',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'document-outline', 
-          label: 'Termos de Uso', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'document-outline',
+          label: 'Termos de Uso',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
-        { 
-          icon: 'shield-checkmark-outline', 
-          label: 'Política de Privacidade', 
-          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento') 
+        {
+          icon: 'shield-checkmark-outline',
+          label: 'Política de Privacidade',
+          onPress: () => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')
         },
       ],
     },
@@ -116,12 +118,9 @@ export default function ProfileScreen({ navigation }) {
         {
           text: 'Sair',
           style: 'destructive',
-          onPress: () => {
-            // Limpar dados de autenticação e voltar para login
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Login' }],
-            });
+          onPress: async() => {
+            Alert.alert('Sucesso', 'Sua conta foi deslogada.');
+            await signOut();
           },
         },
       ]
@@ -140,16 +139,16 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.userName}>{user.name}</Text>
             <Text style={styles.userEmail}>{user.email}</Text>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.editButton}
             onPress={() => Alert.alert('Em breve', 'Funcionalidade em desenvolvimento')}
           >
-            <Ionicons name="create-outline" size={20} color="#fff" />
+            <Ionicons name="create-outline" size={30} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
 
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
       >
@@ -169,10 +168,10 @@ export default function ProfileScreen({ navigation }) {
         {/* Configurações */}
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Configurações</Text>
-          
+
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="notifications-outline" size={22} color="#007AFF" />
+              <Ionicons name="notifications-outline" size={20} color="#007AFF" />
               <Text style={styles.settingLabel}>Notificações</Text>
             </View>
             <Switch
@@ -252,12 +251,14 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#007AFF',
     paddingTop: 50,
-    paddingBottom: 24,
+    paddingBottom: 20,
     paddingHorizontal: 20,
+    marginBottom: 10,
   },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
+
   },
   profileImage: {
     width: 70,
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#fff',
     marginHorizontal: 20,
-    marginTop: -20,
+    marginTop: 5,
     marginBottom: 20,
     padding: 16,
     borderRadius: 12,
@@ -308,6 +309,7 @@ const styles = StyleSheet.create({
   },
   quickInfoItem: {
     flex: 1,
+    paddingBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

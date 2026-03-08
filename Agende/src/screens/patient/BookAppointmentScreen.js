@@ -10,10 +10,13 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
+import { consultaAPI } from '../../services/api';
 
-export default function AppointmentScreen({ navigation, route }) {
+export default function BookAppointmentScreen({ navigation, route }) {
   const { doctor } = route.params;
-  
+  const { user } = useAuth();
+
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [appointmentType, setAppointmentType] = useState('presencial');
@@ -22,11 +25,11 @@ export default function AppointmentScreen({ navigation, route }) {
   const generateDates = () => {
     const dates = [];
     const today = new Date();
-    
+
     for (let i = 1; i <= 7; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      
+
       // Pula fins de semana
       if (date.getDay() !== 0 && date.getDay() !== 6) {
         dates.push({
@@ -60,18 +63,31 @@ export default function AppointmentScreen({ navigation, route }) {
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Confirmar',
-          onPress: () => {
-            // Aqui você faria a chamada à API para agendar
-            Alert.alert(
-              'Sucesso!',
-              'Sua consulta foi agendada com sucesso!',
-              [
+          onPress: async() => {
+            // Aqui faz a chamada à API para agendar
+            try {
+              const dataFormatada = selectedDate.fullDate.toISOString().split('T')[0];
+              const requestData ={
+                pacienteId: user.id,
+                profissionalId: doctor.id,
+                data: dataFormatada,
+                horario: '${selectedTime}:00',
+                motivoConsulta: 'Consulta ${appointmentType}',
+                observacoes: "Agendamento de consulta para ${appointmentType} com ${doctor.name} para ${selectedDate.day} de ${selectedDate.month} às ${selectedTime}",
+              }
+              await consultaAPI.agendar(requestData);
+              console.log('Enviando agendamento para a API...', requestData);
+
+              Alert.alert('Sucesso!', 'Sua consulta foi agendada com sucesso!',[
                 {
                   text: 'OK',
                   onPress: () => navigation.navigate('Main', { screen: 'Appointments' }),
-                },
-              ]
-            );
+                }
+              ]);
+            } catch (error) {
+              console.log('Erro ao agendar consulta:', error.response?.data || error.message);
+              Alert.alert('Erro', 'Não foi possível agendar a consulta. Tente novamente.');
+            }
           },
         },
       ]
@@ -81,7 +97,7 @@ export default function AppointmentScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      
+
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Informações do Médico */}
         <View style={styles.doctorCard}>
@@ -195,7 +211,7 @@ export default function AppointmentScreen({ navigation, route }) {
         {selectedDate && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Selecione o Horário</Text>
-            
+
             <Text style={styles.periodTitle}>Manhã</Text>
             <View style={styles.timeSlotsContainer}>
               {timeSlots.morning.map((time) => (

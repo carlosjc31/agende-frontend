@@ -48,7 +48,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -61,7 +61,7 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
       >
@@ -93,7 +93,7 @@ export default function HomeScreen({ navigation }) {
                 </View>
               </View>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.viewButton}
               onPress={() => navigation.navigate('Appointments')}
             >
@@ -105,8 +105,8 @@ export default function HomeScreen({ navigation }) {
         {/* Especialidades */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Especialidades</Text>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.specialtiesScroll}
           >
@@ -133,14 +133,14 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.seeAll}>Ver Todos</Text>
             </TouchableOpacity>
           </View>
-          
+
           {recentDoctors.map((doctor) => (
             <TouchableOpacity
               key={doctor.id}
               style={styles.doctorCard}
               onPress={() => navigation.navigate('DoctorProfile', { doctorId: doctor.id })}
             >
-              <Image 
+              <Image
                 source={{ uri: doctor.image }}
                 style={styles.doctorImage}
               />

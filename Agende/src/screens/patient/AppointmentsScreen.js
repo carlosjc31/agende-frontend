@@ -96,11 +96,11 @@ export default function AppointmentsScreen({ navigation }) {
   };
 
   const handleReschedule = (appointment) => {
-    navigation.navigate('Appointment', { 
-      doctor: { 
-        name: appointment.doctor, 
-        specialty: appointment.specialty 
-      } 
+    navigation.navigate('Appointment', {
+      doctor: {
+        name: appointment.doctor,
+        specialty: appointment.specialty
+      }
     });
   };
 
@@ -195,10 +195,10 @@ export default function AppointmentsScreen({ navigation }) {
           <Text style={styles.infoText}>{appointment.time}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Ionicons 
-            name={appointment.type === 'online' ? 'videocam-outline' : 'business-outline'} 
-            size={18} 
-            color="#666" 
+          <Ionicons
+            name={appointment.type === 'online' ? 'videocam-outline' : 'business-outline'}
+            size={18}
+            color="#666"
           />
           <Text style={styles.infoText}>
             {appointment.type === 'online' ? 'Telemedicina' : 'Presencial'}
@@ -223,7 +223,7 @@ export default function AppointmentsScreen({ navigation }) {
               <Text style={styles.actionButtonText}>Entrar na Chamada</Text>
             </TouchableOpacity>
           )}
-          
+
           <View style={styles.secondaryActions}>
             <TouchableOpacity
               style={styles.secondaryButton}
@@ -293,14 +293,14 @@ export default function AppointmentsScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
         {activeTab === 'proximas' && upcomingAppointments.length > 0 && (
           <>
-            {upcomingAppointments.map((appointment) => 
+            {upcomingAppointments.map((appointment) =>
               renderAppointmentCard(appointment, false)
             )}
           </>
@@ -324,7 +324,7 @@ export default function AppointmentsScreen({ navigation }) {
 
         {activeTab === 'historico' && pastAppointments.length > 0 && (
           <>
-            {pastAppointments.map((appointment) => 
+            {pastAppointments.map((appointment) =>
               renderAppointmentCard(appointment, true)
             )}
           </>

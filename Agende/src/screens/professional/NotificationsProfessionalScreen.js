@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function NotificationsScreen() {
+export default function NotificationsProfessionalScreen() {
   const [filter, setFilter] = useState('todas');
 
   const notifications = useMemo(

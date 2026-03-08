@@ -39,8 +39,8 @@ export default function LoginScreen({ navigation }) {
       const result = await signIn(email, password);
 
       if (result.success) {
-        // Navegação será feita automaticamente pelo AuthContext
-        Alert.alert('Sucesso', 'Login realizado com sucesso!');
+
+        console.log('Login efetuado! Redirecionamento automático em ação...');
       } else {
         Alert.alert('Erro', result.message);
       }

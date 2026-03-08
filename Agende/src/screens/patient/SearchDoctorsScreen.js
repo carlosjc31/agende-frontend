@@ -74,7 +74,7 @@ export default function SearchDoctorsScreen({ navigation }) {
   const filteredDoctors = doctors.filter(doctor => {
     const matchesSearch = doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSpecialty = selectedSpecialty === 'Todas' || 
+    const matchesSpecialty = selectedSpecialty === 'Todas' ||
                             doctor.specialty === selectedSpecialty;
     return matchesSearch && matchesSpecialty;
   });
@@ -82,7 +82,7 @@ export default function SearchDoctorsScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Buscar Médicos</Text>
@@ -107,8 +107,8 @@ export default function SearchDoctorsScreen({ navigation }) {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Filtro de Especialidades */}
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.filtersScroll}
           contentContainerStyle={styles.filtersContent}
@@ -133,8 +133,8 @@ export default function SearchDoctorsScreen({ navigation }) {
         </ScrollView>
 
         {/* Filtros Adicionais */}
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.filtersScroll}
           contentContainerStyle={styles.filtersContent}
@@ -148,10 +148,10 @@ export default function SearchDoctorsScreen({ navigation }) {
               ]}
               onPress={() => setSelectedFilter(filter)}
             >
-              <Ionicons 
-                name="funnel-outline" 
-                size={14} 
-                color={selectedFilter === filter ? '#007AFF' : '#666'} 
+              <Ionicons
+                name="funnel-outline"
+                size={14}
+                color={selectedFilter === filter ? '#007AFF' : '#666'}
               />
               <Text style={[
                 styles.filterButtonText,
@@ -175,7 +175,7 @@ export default function SearchDoctorsScreen({ navigation }) {
               style={styles.doctorCard}
               onPress={() => navigation.navigate('DoctorProfile', { doctorId: doctor.id })}
             >
-              <Image 
+              <Image
                 source={{ uri: doctor.image }}
                 style={styles.doctorImage}
               />
@@ -188,17 +188,17 @@ export default function SearchDoctorsScreen({ navigation }) {
                     </View>
                   )}
                 </View>
-                
+
                 <Text style={styles.doctorSpecialty}>{doctor.specialty}</Text>
                 <Text style={styles.doctorHospital}>{doctor.hospital}</Text>
-                
+
                 <View style={styles.doctorDetails}>
                   <View style={styles.ratingContainer}>
                     <Ionicons name="star" size={14} color="#FFD700" />
                     <Text style={styles.rating}>{doctor.rating}</Text>
                     <Text style={styles.reviews}>({doctor.reviews} avaliações)</Text>
                   </View>
-                  
+
                   <View style={styles.detailsRow}>
                     <View style={styles.detailItem}>
                       <Ionicons name="location-outline" size={14} color="#666" />

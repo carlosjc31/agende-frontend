@@ -6,7 +6,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function ConsultasScreen({ navigation }) {
+export default function ConsultaScreen({ navigation }) {
   const [tab, setTab] = useState('hoje');
 
   const data = useMemo(
