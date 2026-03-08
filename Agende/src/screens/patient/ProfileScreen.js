@@ -15,18 +15,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function ProfileScreen({ navigation }) {
-  const { signOut } = useAuth();
+  const { signOut, user: authUser } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
 
-  const user = {
-    name: 'João Silva',
-    email: 'joao.silva@email.com',
-    phone: '(11) 98765-4321',
-    cpf: '123.456.789-00',
-    birthDate: '15/05/1990',
-    bloodType: 'O+',
-    image: 'https://via.placeholder.com/150',
+  const userProfile = {
+    name: authUser?.nome || authUser?.nome_completo || 'Paciente Agende',
+    email: authUser?.email || 'email@naocadastrado.com',
+    phone: authUser?.telefone || '(00) 00000-0000',
+    cpf: authUser?.cpf || '000.000.000-00',
+    bloodType: 'O+', // Se você não tiver tipo sanguíneo no banco, deixamos este padrão
+    image: authUser?.foto_url || 'https://via.placeholder.com/150',
   };
 
   const menuSections = [
@@ -134,10 +133,10 @@ export default function ProfileScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.profileSection}>
-          <Image source={{ uri: user.image }} style={styles.profileImage} />
+          <Image source={{ uri: userProfile.image }} style={styles.profileImage} />
           <View style={styles.profileInfo}>
-            <Text style={styles.userName}>{user.name}</Text>
-            <Text style={styles.userEmail}>{user.email}</Text>
+            <Text style={styles.userName}>{userProfile.name}</Text>
+            <Text style={styles.userEmail}>{userProfile.email}</Text>
           </View>
           <TouchableOpacity
             style={styles.editButton}
@@ -156,12 +155,12 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.quickInfoCard}>
           <View style={styles.quickInfoItem}>
             <Ionicons name="call-outline" size={20} color="#666" />
-            <Text style={styles.quickInfoText}>{user.phone}</Text>
+            <Text style={styles.quickInfoText}>{userProfile.phone}</Text>
           </View>
           <View style={styles.quickInfoDivider} />
           <View style={styles.quickInfoItem}>
             <Ionicons name="water-outline" size={20} color="#666" />
-            <Text style={styles.quickInfoText}>Tipo: {user.bloodType}</Text>
+            <Text style={styles.quickInfoText}>Tipo: {userProfile.bloodType}</Text>
           </View>
         </View>
 

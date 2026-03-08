@@ -10,9 +10,11 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function HomeScreen({ navigation }) {
-  const [userName, setUserName] = useState('João Silva');
+  const { user } = useAuth();
+  const userName = user?.name || user?.nome_completo || 'Paciente';
   const [nextAppointment, setNextAppointment] = useState({
     doctor: 'Dra. Maria Santos',
     specialty: 'Cardiologista',
