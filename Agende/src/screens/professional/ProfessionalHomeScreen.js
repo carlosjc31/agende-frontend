@@ -156,6 +156,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
         </View>
 
         {/* Traz as consultas reais do profissional */}
+
         {loading ? (
            <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />
         ) : consultasReais?.length === 0 ? (
@@ -165,9 +166,8 @@ export default function ProfessionalHomeScreen({ navigation }) {
             <View key={consulta.id || index} style={styles.appointmentCard}>
               {/* ATENÇÃO AOS NOMES DAS VARIÁVEIS AQUI */}
               {/* Verifique se o Java devolve paciente.nome ou nomePaciente */}
-              <Text style={styles.patientName}>Consulta do Paciente</Text>
               <Text style={styles.appointmentDetails}>
-                📅 {consulta.dataConsulta} às ⏰ {consulta.horaConsulta}
+                📅 {consulta.dataConsulta} às ⏰ {consulta.horaConsulta} • {consulta.status}
               </Text>
             </View>
 
