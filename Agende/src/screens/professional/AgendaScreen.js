@@ -44,7 +44,7 @@ export default function AgendaScreen() {
         return '#007AFF';
     }
   };
-
+  // em breve
   const toggleSlot = (slot) => {
     Alert.alert('Ação', `Em breve: alterar status do horário ${slot.time} (${slot.status}).`);
   };

@@ -113,7 +113,7 @@ export default function AppointmentsScreen({ navigation }) {
         {
           text: 'Iniciar Chamada',
           onPress: () => {
-            // Aqui iniciaria a videochamada
+            // Iniciar videochamada
             console.log('Iniciando videochamada...');
           },
         },

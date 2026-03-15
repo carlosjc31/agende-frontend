@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { profissionalAPI } from '../../services/api';
 
 export default function DoctorProfileScreen({ route, navigation }) {
-  // Recebemos o ID do médico que foi clicado lá na tela de Busca
+
   const { doctorId } = route.params;
 
   const [doctor, setDoctor] = useState(null);
@@ -17,7 +17,7 @@ export default function DoctorProfileScreen({ route, navigation }) {
   useEffect(() => {
     carregarDetalhesDoMedico();
   }, [doctorId]);
-
+  // Função para carregar os detalhes do profissional
   const carregarDetalhesDoMedico = async () => {
     try {
       const data = await profissionalAPI.buscarPorId(doctorId);
@@ -30,7 +30,7 @@ export default function DoctorProfileScreen({ route, navigation }) {
     }
   };
 
-  // Enquanto o Java busca os dados, mostramos o "Carregando..."
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -42,7 +42,7 @@ export default function DoctorProfileScreen({ route, navigation }) {
 
   if (!doctor) return null;
 
-  // Formatar os dados para enviarmos para a tela de Agendamento
+  // Dados para agendamento
   const doctorDataForAppointment = {
     id: doctor.id,
     name: doctor.nomeCompleto || doctor.nome,

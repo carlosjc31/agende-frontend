@@ -22,7 +22,7 @@ export default function SearchDoctorsScreen({ navigation }) {
   const [selectedSpecialty, setSelectedSpecialty] = useState('Todas');
   const [selectedFilter, setSelectedFilter] = useState('Todos');
 
-  // Nossos novos estados dinâmicos
+  // CAMADA DE SEGURANÇA 1: Garante que doctors seja sempre uma lista
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +33,7 @@ export default function SearchDoctorsScreen({ navigation }) {
   useEffect(() => {
     carregarProfissionais();
   }, []);
-
+// Função para carregar os dados
 const carregarProfissionais = async () => {
     try {
       setLoading(true);

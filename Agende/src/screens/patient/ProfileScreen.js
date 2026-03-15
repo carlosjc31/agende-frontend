@@ -18,7 +18,7 @@ export default function ProfileScreen({ navigation }) {
   const { signOut, user: authUser } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
-
+  // Dados do perfil do paciente
   const userProfile = {
     name: authUser?.nome || authUser?.nome_completo || 'Paciente Agende',
     email: authUser?.email || 'email@naocadastrado.com',
@@ -27,7 +27,7 @@ export default function ProfileScreen({ navigation }) {
     bloodType: 'O+', // Se você não tiver tipo sanguíneo no banco, deixamos este padrão
     image: authUser?.foto_url || 'https://via.placeholder.com/150',
   };
-
+  // Menu de opções
   const menuSections = [
     {
       title: 'Minha Conta',
@@ -107,7 +107,7 @@ export default function ProfileScreen({ navigation }) {
       ],
     },
   ];
-
+  // Funcionalidades de Perfil
   const handleLogout = () => {
     Alert.alert(
       'Sair',

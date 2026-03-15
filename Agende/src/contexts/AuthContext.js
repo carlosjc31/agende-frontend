@@ -38,8 +38,6 @@ export const AuthProvider = ({ children }) => {
 
       console.log("PASSO 2: O Java respondeu!", response);
 
-      // A BARREIRA DE SEGURANÇA AJUSTADA 🛡️
-      // O Java pode chamar de 'token', 'accessToken' ou enviar apenas o texto direto.
       const tokenReal = response.token || response.accessToken || (typeof response === 'string' ? response : null);
 
       if (!tokenReal) {
@@ -48,7 +46,7 @@ export const AuthProvider = ({ children }) => {
 
       console.log("PASSO 3: Token real recebido. Guardando dados...");
 
-      // Salva o tokenReal que descobrimos acima
+      // Salva o tokenReal no AsyncStorage
       setUser(response);
       await AsyncStorage.setItem('@agende:user', JSON.stringify(response));
       await AsyncStorage.setItem('@agende:token', tokenReal);
@@ -59,7 +57,6 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.log("ERRO NO LOGIN DO JAVA:", error.response?.data || error.message);
 
-      // Limpeza de emergência: garante que não fica nenhum "token fantasma" guardado se der erro
       await AsyncStorage.multiRemove(['@agende:user', '@agende:token']);
       setUser(null);
 
@@ -73,20 +70,18 @@ export const AuthProvider = ({ children }) => {
       // 1. Fazemos a chamada para a API
       const response = await authAPI.registerPaciente(dadosPaciente);
 
-      // 2. A CORREÇÃO: Verificamos se o token REALMENTE veio na resposta
       if (response && response.token) {
         await AsyncStorage.setItem('@agende:token', response.token);
-        // setUser(response.user); // Se o backend já enviar os dados do usuário
+
       } else {
-        // Se não veio token, significa que o cadastro deu certo,
-        // mas o usuário precisa ir para a tela de Login para gerar o token!
+
         console.log("Cadastro realizado sem auto-login. Token não recebido.");
       }
 
       return { success: true };
     } catch (error) {
       console.log("Erro no cadastro:", error);
-      // Aqui garantimos que o erro é repassado para a tela mostrar o Alert, em vez de travar
+
       throw error;
     }
   };

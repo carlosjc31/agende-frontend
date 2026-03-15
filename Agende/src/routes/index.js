@@ -30,6 +30,9 @@ import NotificationsProfessionalScreen from '../screens/professional/Notificatio
 // --- IMPORTAÇÃO DAS TELAS DO ADMIN ---
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
 import ValidarProfissionalScreen from '../screens/admin/ValidarProfissionalScreen';
+import GerenciarPacientesScreen from '../screens/admin/GerenciarPacientesScreen';
+import GerenciarProfissionaisScreen from '../screens/admin/GerenciarProfissionaisScreen';
+import ConsultasDiaAdminScreen from '../screens/admin/ConsultasDiaAdminScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -130,7 +133,9 @@ function AdminRoutes() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
       <Stack.Screen name="ValidarProfissional" component={ValidarProfissionalScreen} />
-      {/* Adicione as outras telas do Admin aqui no futuro */}
+      <Stack.Screen name="GerenciarPacientes" component={GerenciarPacientesScreen} />
+      <Stack.Screen name="GerenciarProfissionais" component={GerenciarProfissionaisScreen} />
+      <Stack.Screen name="ConsultasDia" component={ConsultasDiaAdminScreen} />
     </Stack.Navigator>
   );
 }

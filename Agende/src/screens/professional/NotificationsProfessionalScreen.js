@@ -13,7 +13,7 @@ export default function NotificationsProfessionalScreen() {
     ],
     []
   );
-
+  // em breve
   const icon = (type) => {
     switch (type) {
       case 'consulta':

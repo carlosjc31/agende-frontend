@@ -1,14 +1,46 @@
 // ============================================
-// TELA HOME DO PROFISSIONAL - Dashboard
+// TELA HOME DO PROFISSIONAL
 // ============================================
 
-import React, { useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import React, { useMemo, useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import { useAuth } from '../../contexts/AuthContext';
+import { consultaAPI } from '../../services/api';
 
 export default function ProfessionalHomeScreen({ navigation }) {
+  const { user } = useAuth();
+  const [ consultasReais, setConsultasReais] = useState([]);
+  const [ loading, setLoading ] = useState(true);
 
+  useEffect(() => {
+    carregarConsultas();
+  }, []);
+
+  const carregarConsultas = async () => {
+    try {
+      console.log("DADOS DA MÉDICA LOGADA:", JSON.stringify(user, null, 2));
+
+      console.log("Buscando consultas para a médica ID:", user.perfilId);
+
+      const dados = await consultaAPI.listarPorProfissional(user.perfilId);
+
+      // 1. O Raio-X definitivo: Vamos ver o que o Java realmente mandou!
+      console.log("Resposta REAL do Java:", JSON.stringify(dados, null, 2));
+
+      // 2. O Escudo Sênior: Se for um array direto, usamos. Se o Java mandou dentro de "content" (paginação), puxamos de lá. Se der erro, assumimos [] (vazio).
+      const listaSegura = Array.isArray(dados) ? dados : (dados?.content || []);
+
+      setConsultasReais(listaSegura);
+
+    } catch (error) {
+      console.log("Erro ao buscar consultas da médica:", error);
+      // Se a API falhar, não quebra a tela, apenas mostra lista vazia
+      setConsultasReais([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const professional = useMemo(
     () => ({
@@ -121,32 +153,31 @@ export default function ProfessionalHomeScreen({ navigation }) {
               <Text style={styles.link}>Ver todas</Text>
             </TouchableOpacity>
           </View>
-
-          {nextConsultas.map((c) => (
-            <TouchableOpacity
-              key={c.id}
-              style={styles.consultaCard}
-              onPress={() => navigation.navigate('ConsultaDetails', { consultaId: c.id })}
-            >
-              <View style={styles.consultaTop}>
-                <View style={styles.avatar}>
-                  <Ionicons name="person" size={18} color="#fff" />
-                </View>
-                <View style={styles.consultaInfo}>
-                  <Text style={styles.consultaName}>{c.paciente}</Text>
-                  <Text style={styles.consultaMeta}>{c.data} • {c.hora} • {c.tipo}</Text>
-                </View>
-                <View style={[styles.statusPill, { backgroundColor: statusColor(c.status) }]}>
-                  <Text style={styles.statusText}>{c.status}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
         </View>
+
+        {/* Traz as consultas reais do profissional */}
+        {loading ? (
+           <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />
+        ) : consultasReais?.length === 0 ? (
+           <Text style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>Nenhuma consulta agendada.</Text>
+        ) : (
+           consultasReais?.map((consulta, index) => (
+            <View key={consulta.id || index} style={styles.appointmentCard}>
+              {/* ATENÇÃO AOS NOMES DAS VARIÁVEIS AQUI */}
+              {/* Verifique se o Java devolve paciente.nome ou nomePaciente */}
+              <Text style={styles.patientName}>Consulta do Paciente</Text>
+              <Text style={styles.appointmentDetails}>
+                📅 {consulta.dataConsulta} às ⏰ {consulta.horaConsulta}
+              </Text>
+            </View>
+
+          ))
+        )}
+
       </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },

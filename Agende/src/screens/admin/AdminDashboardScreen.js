@@ -3,10 +3,20 @@
 // ============================================
 
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function AdminDashboardScreen({ navigation }) {
+  const { signOut } = useAuth();
+  // Funcionalidades de Perfil
+  const handleLogout = () => {
+    Alert.alert('Sair', 'Deseja realmente sair da área administrativa?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Sair', style: 'destructive', onPress: async () => await signOut() },
+    ]);
+  };
+
   const stats = useMemo(
     () => ({
       profissionaisPendentes: 4,
@@ -74,6 +84,12 @@ export default function AdminDashboardScreen({ navigation }) {
             </TouchableOpacity>
           ))}
         </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={20} color="#FF3B30" />
+          <Text style={styles.logoutButtonText}>Sair do Painel Admin</Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </View>
   );
@@ -128,4 +144,22 @@ const styles = StyleSheet.create({
   cardBody: { flex: 1, marginLeft: 12 },
   cardTitle: { fontSize: 14, fontWeight: '800', color: '#333' },
   cardSub: { marginTop: 4, color: '#666', fontSize: 12 },
+
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#FF3B30',
+  },
+  logoutButtonText: {
+    color: '#FF3B30',
+    fontWeight: '800',
+    marginLeft: 8,
+    fontSize: 15,
+  },
 });

@@ -122,7 +122,7 @@ export default function SignUpScreen({ navigation }) {
         Alert.alert('Erro', result.message);
       }
     } catch (error) {
-      // Vamos capturar a fofoca exata que o Spring Boot mandou de volta
+
       const erroDoBackend = error.response?.data;
       // ESTA LINHA VAI MOSTRAR O ERRO REAL NO TERMINAL DO EXPO:
       console.log("ERRO DETALHADO DO BACKEND:", erroDoBackend);

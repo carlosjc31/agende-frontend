@@ -28,9 +28,9 @@ export default function LoginScreen({ navigation }) {
 const handleLogin = async () => {
   const result = await signIn(email, password);
   if (!result.success) {
-    Alert.alert('Erro', result.message); // Avisa que deu erro e NÃO navega!
+    Alert.alert('Erro', result.message);
   }
-  // Se for sucesso, o próprio AuthContext já muda o estado e o React Native navega sozinho para a Home.
+
 };
 
   const handleSignUp = () => {
@@ -50,7 +50,7 @@ const handleLogin = async () => {
         {/* Logo e Nome do App */}
         <View style={styles.logoContainer}>
           <Image
-            //source={require('./assets/logo.png')}
+
             style={styles.logo}
             resizeMode="contain"
           />

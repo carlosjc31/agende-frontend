@@ -107,14 +107,20 @@ export const profissionalAPI = {
 
 export const consultaAPI = {
   // Agendar consulta
-  agendar: async (pacienteId, data) => {
-    const response = await api.post(`/consultas/agendar/${pacienteId}`, data);
+  agendar: async (pacienteId, dados) => {
+    const response = await api.post(`/consultas/agendar/${pacienteId}`, dados);
     return response.data;
   },
 
   // Listar consultas do paciente
   listarPorPaciente: async (pacienteId) => {
     const response = await api.get(`/consultas/paciente/${pacienteId}`);
+    return response.data;
+  },
+
+  listarPorProfissional: async (profissionalId) => {
+    // Nota: ajuste a rota '/consultas/profissional/' se no seu Java for diferente!
+    const response = await api.get(`/consultas/profissional/${profissionalId}`);
     return response.data;
   },
 

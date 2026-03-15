@@ -1,5 +1,5 @@
 // screens/BookAppointmentScreen.js
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import {
   View,
   Text,
@@ -50,6 +50,7 @@ export default function BookAppointmentScreen({ navigation, route }) {
     afternoon: ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30'],
   };
 
+  // Funções para selecionar data e horário
   const handleConfirm = () => {
     if (!selectedDate || !selectedTime) {
       Alert.alert('Atenção', 'Por favor, selecione uma data e horário');
@@ -63,20 +64,23 @@ export default function BookAppointmentScreen({ navigation, route }) {
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Confirmar',
+
           onPress: async() => {
             // Aqui faz a chamada à API para agendar
             try {
               const dataFormatada = selectedDate.fullDate.toISOString().split('T')[0];
               const requestData ={
-                pacienteId: user.id,
+                //pacienteId: user.perfilId,
                 profissionalId: doctor.id,
-                data: dataFormatada,
-                horario: '${selectedTime}:00',
-                motivoConsulta: 'Consulta ${appointmentType}',
-                observacoes: "Agendamento de consulta para ${appointmentType} com ${doctor.name} para ${selectedDate.day} de ${selectedDate.month} às ${selectedTime}",
-              }
-              await consultaAPI.agendar(requestData);
+                dataConsulta: dataFormatada,
+                horaConsulta: `${selectedTime}:00`,
+                motivoConsulta: `Consulta ${appointmentType}`,
+                observacoes: `Agendamento de consulta para ${appointmentType} com ${doctor.name} para ${selectedDate.day} de ${selectedDate.month} às ${selectedTime}.`,
+              };
+
               console.log('Enviando agendamento para a API...', requestData);
+              //console.log('DADOS DO USUARIO LOGADO:', JSON.stringify(user, null, 2));
+              await consultaAPI.agendar(user.perfilId, requestData);
 
               Alert.alert('Sucesso!', 'Sua consulta foi agendada com sucesso!',[
                 {
@@ -93,7 +97,7 @@ export default function BookAppointmentScreen({ navigation, route }) {
       ]
     );
   };
-
+  // Renderização da tela de agendamento
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />

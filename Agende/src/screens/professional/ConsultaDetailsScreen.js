@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function ConsultaDetailsScreen({ route, navigation }) {
   const { consultaId } = route.params || {};
-
+  // placeholder
   const consulta = useMemo(
     () => ({
       id: consultaId || 'c1',
@@ -19,7 +19,7 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
     }),
     [consultaId]
   );
-
+  
   const statusColor = (status) => {
     switch (status) {
       case 'confirmada':
