@@ -2,8 +2,29 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Switch, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ProfessionalProfileScreen({ navigation }) {
+
+  const { signOut } = useAuth();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sair',
+      'Deseja realmente sair da sua conta?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: async () => {
+            await signOut();
+          },
+        },
+      ]
+    );
+  };
+
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [onlineEnabled, setOnlineEnabled] = useState(true);
 
@@ -90,12 +111,20 @@ export default function ProfessionalProfileScreen({ navigation }) {
           <Ionicons name="notifications" size={18} color="#fff" />
           <Text style={styles.buttonText}>Ver notificações</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={20} color="#FF3B30" />
+          <Text style={styles.logoutButtonText}>Sair da Conta</Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+
+
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: { backgroundColor: '#007AFF', paddingTop: 50, paddingBottom: 18, paddingHorizontal: 20 },
   topRow: { flexDirection: 'row', alignItems: 'center' },
@@ -133,4 +162,16 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   buttonText: { color: '#fff', fontWeight: '800', marginLeft: 10 },
+  logoutButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#FF3B30',
+    marginTop: 15,
+  },
+  logoutButtonText: {
+    color: '#FF3B30',
+    fontWeight: '800',
+    marginLeft: 10
+  },
+
 });

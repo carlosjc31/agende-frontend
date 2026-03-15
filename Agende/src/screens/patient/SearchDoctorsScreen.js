@@ -1,5 +1,5 @@
 // screens/SearchDoctorsScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,73 +9,74 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+// Importando a nossa API
+import { profissionalAPI } from '../../services/api';
 
 export default function SearchDoctorsScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('Todas');
   const [selectedFilter, setSelectedFilter] = useState('Todos');
 
+  // Nossos novos estados dinâmicos
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const specialties = ['Todas', 'Cardiologia', 'Pediatria', 'Ortopedia', 'Dermatologia'];
   const filters = ['Todos', 'Maior Avaliação', 'Mais Próximo', 'Menor Preço'];
 
-  const doctors = [
-    {
-      id: 1,
-      name: 'Dra. Maria Santos',
-      specialty: 'Cardiologista',
-      rating: 4.9,
-      reviews: 127,
-      price: 'R$ 250',
-      distance: '2.5 km',
-      available: true,
-      image: 'https://via.placeholder.com/100',
-      hospital: 'Hospital São Lucas',
-    },
-    {
-      id: 2,
-      name: 'Dr. Carlos Lima',
-      specialty: 'Ortopedista',
-      rating: 4.8,
-      reviews: 95,
-      price: 'R$ 200',
-      distance: '3.1 km',
-      available: true,
-      image: 'https://via.placeholder.com/100',
-      hospital: 'Clínica Vida',
-    },
-    {
-      id: 3,
-      name: 'Dra. Ana Costa',
-      specialty: 'Dermatologista',
-      rating: 4.9,
-      reviews: 143,
-      price: 'R$ 280',
-      distance: '1.8 km',
-      available: false,
-      image: 'https://via.placeholder.com/100',
-      hospital: 'Clínica Beleza & Saúde',
-    },
-    {
-      id: 4,
-      name: 'Dr. Pedro Alves',
-      specialty: 'Pediatra',
-      rating: 4.7,
-      reviews: 89,
-      price: 'R$ 180',
-      distance: '4.2 km',
-      available: true,
-      image: 'https://via.placeholder.com/100',
-      hospital: 'Hospital Infantil',
-    },
-  ];
+  // Busca os dados no momento em que a tela abre
+  useEffect(() => {
+    carregarProfissionais();
+  }, []);
 
-  const filteredDoctors = doctors.filter(doctor => {
-    const matchesSearch = doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+const carregarProfissionais = async () => {
+    try {
+      setLoading(true);
+
+      // RASTREADOR 1: Garante que a função iniciou
+      console.log("1. A iniciar a busca de médicos no IP da API...");
+
+      const data = await profissionalAPI.listarTodos();
+
+      // RASTREADOR 2: Garante que o Java respondeu
+      console.log("2. O Java respondeu! Dados recebidos:", JSON.stringify(data, null, 2));
+
+      if (Array.isArray(data)) {
+        setDoctors(data);
+      } else if (data && Array.isArray(data.content)) {
+        setDoctors(data.content);
+      } else if (data && Array.isArray(data.data)) {
+        setDoctors(data.data);
+      } else {
+        setDoctors([]);
+      }
+
+    } catch (error) {
+      // RASTREADOR 3: Mostra se a chamada falhou (ex: Timeout ou Network Error)
+      console.log("3. Erro na ligação com o Java:", error.message);
+      Alert.alert('Aviso', 'Não foi possível ligar ao servidor.');
+      setDoctors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // CAMADA DE SEGURANÇA 2: Garante que doctors é sempre uma lista antes de filtrar
+  const safeDoctors = Array.isArray(doctors) ? doctors : [];
+
+  const filteredDoctors = safeDoctors.filter(doctor => {
+    const nome = doctor.nomeCompleto || doctor.nome || '';
+    const especialidade = doctor.especialidade || '';
+
+    const matchesSearch = nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         especialidade.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSpecialty = selectedSpecialty === 'Todas' ||
-                            doctor.specialty === selectedSpecialty;
+                             especialidade === selectedSpecialty;
     return matchesSearch && matchesSpecialty;
   });
 
@@ -132,7 +133,7 @@ export default function SearchDoctorsScreen({ navigation }) {
           ))}
         </ScrollView>
 
-        {/* Filtros Adicionais */}
+        {/* Filtros Adicionais (Mantidos intactos do seu design original!) */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -169,50 +170,60 @@ export default function SearchDoctorsScreen({ navigation }) {
             {filteredDoctors.length} médico(s) encontrado(s)
           </Text>
 
-          {filteredDoctors.map((doctor) => (
-            <TouchableOpacity
-              key={doctor.id}
-              style={styles.doctorCard}
-              onPress={() => navigation.navigate('DoctorProfile', { doctorId: doctor.id })}
-            >
-              <Image
-                source={{ uri: doctor.image }}
-                style={styles.doctorImage}
-              />
-              <View style={styles.doctorInfo}>
-                <View style={styles.doctorHeader}>
-                  <Text style={styles.doctorName}>{doctor.name}</Text>
-                  {doctor.available && (
-                    <View style={styles.availableBadge}>
-                      <Text style={styles.availableText}>Disponível</Text>
-                    </View>
-                  )}
-                </View>
+          {loading ? (
+            <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 40 }} />
+          ) : (
+            filteredDoctors.map((doctor) => (
+              <TouchableOpacity
+                key={doctor.id}
+                style={styles.doctorCard}
+                // Agora envia o ID real do banco (UUID) para a tela de Perfil do Médico
+                onPress={() => navigation.navigate('DoctorProfile', { doctorId: doctor.id })}
+              >
+                <Image
+                  source={{ uri: doctor.fotoUrl || 'https://via.placeholder.com/100' }}
+                  style={styles.doctorImage}
+                />
+                <View style={styles.doctorInfo}>
+                  <View style={styles.doctorHeader}>
+                    <Text style={styles.doctorName}>{doctor.nomeCompleto || doctor.nome}</Text>
 
-                <Text style={styles.doctorSpecialty}>{doctor.specialty}</Text>
-                <Text style={styles.doctorHospital}>{doctor.hospital}</Text>
-
-                <View style={styles.doctorDetails}>
-                  <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={14} color="#FFD700" />
-                    <Text style={styles.rating}>{doctor.rating}</Text>
-                    <Text style={styles.reviews}>({doctor.reviews} avaliações)</Text>
+                    {/* Alterado de "available" para "validado" do seu PostgreSQL */}
+                    {doctor.validado && (
+                      <View style={styles.availableBadge}>
+                        <Text style={styles.availableText}>Disponível</Text>
+                      </View>
+                    )}
                   </View>
 
-                  <View style={styles.detailsRow}>
-                    <View style={styles.detailItem}>
-                      <Ionicons name="location-outline" size={14} color="#666" />
-                      <Text style={styles.detailText}>{doctor.distance}</Text>
+                  <Text style={styles.doctorSpecialty}>{doctor.especialidade}</Text>
+                  <Text style={styles.doctorHospital}>{doctor.hospitalClinica || 'Atendimento Particular'}</Text>
+
+                  <View style={styles.doctorDetails}>
+                    <View style={styles.ratingContainer}>
+                      <Ionicons name="star" size={14} color="#FFD700" />
+                      <Text style={styles.rating}>{doctor.avaliacaoMedia || '0.0'}</Text>
+                      <Text style={styles.reviews}>({doctor.totalAvaliacoes || 0} avaliações)</Text>
                     </View>
-                    <View style={styles.detailItem}>
-                      <Ionicons name="cash-outline" size={14} color="#666" />
-                      <Text style={styles.detailText}>{doctor.price}</Text>
+
+                    <View style={styles.detailsRow}>
+                      <View style={styles.detailItem}>
+                        <Ionicons name="location-outline" size={14} color="#666" />
+                        {/* Usamos a cidade do banco como "distância" temporária */}
+                        <Text style={styles.detailText}>{doctor.cidade || 'Local'}</Text>
+                      </View>
+                      <View style={styles.detailItem}>
+                        <Ionicons name="cash-outline" size={14} color="#666" />
+                        <Text style={styles.detailText}>
+                          {doctor.valorConsulta ? `R$ ${doctor.valorConsulta}` : 'Sob Consulta'}
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            ))
+          )}
         </View>
       </ScrollView>
     </View>

@@ -25,31 +25,13 @@ export default function LoginScreen({ navigation }) {
 
   const { signIn } = useAuth();
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      console.log('Tentando login com:', email);
-
-      const result = await signIn(email, password);
-
-      if (result.success) {
-
-        console.log('Login efetuado! Redirecionamento automático em ação...');
-      } else {
-        Alert.alert('Erro', result.message);
-      }
-    } catch (error) {
-      Alert.alert('Erro', 'Falha ao realizar login. Tente novamente.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const handleLogin = async () => {
+  const result = await signIn(email, password);
+  if (!result.success) {
+    Alert.alert('Erro', result.message); // Avisa que deu erro e NÃO navega!
+  }
+  // Se for sucesso, o próprio AuthContext já muda o estado e o React Native navega sozinho para a Home.
+};
 
   const handleSignUp = () => {
     navigation.navigate('SignUp');

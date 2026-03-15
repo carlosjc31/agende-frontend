@@ -6,7 +6,10 @@ import React, { useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+
 export default function ProfessionalHomeScreen({ navigation }) {
+
+
   const professional = useMemo(
     () => ({
       name: 'Dra. Maria Santos',

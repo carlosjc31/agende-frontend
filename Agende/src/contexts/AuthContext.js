@@ -38,48 +38,58 @@ export const AuthProvider = ({ children }) => {
 
       console.log("PASSO 2: O Java respondeu!", response);
 
-      // Verificação de segurança para o AsyncStorage não crashar
-      const tokenRecebido = response.token || response.accessToken || 'sem-token-encontrado';
+      // A BARREIRA DE SEGURANÇA AJUSTADA 🛡️
+      // O Java pode chamar de 'token', 'accessToken' ou enviar apenas o texto direto.
+      const tokenReal = response.token || response.accessToken || (typeof response === 'string' ? response : null);
 
+      if (!tokenReal) {
+         throw new Error("Servidor não enviou um token válido.");
+      }
+
+      console.log("PASSO 3: Token real recebido. Guardando dados...");
+
+      // Salva o tokenReal que descobrimos acima
       setUser(response);
-
-      console.log("PASSO 3: Guardando dados no celular...");
       await AsyncStorage.setItem('@agende:user', JSON.stringify(response));
-      await AsyncStorage.setItem('@agende:token', tokenRecebido);
+      await AsyncStorage.setItem('@agende:token', tokenReal);
 
       console.log("PASSO 4: Tudo pronto, redirecionando para a Home!");
       return { success: true };
 
     } catch (error) {
       console.log("ERRO NO LOGIN DO JAVA:", error.response?.data || error.message);
-      return { success: false, message: 'Erro ao fazer login' };
+
+      // Limpeza de emergência: garante que não fica nenhum "token fantasma" guardado se der erro
+      await AsyncStorage.multiRemove(['@agende:user', '@agende:token']);
+      setUser(null);
+
+      return { success: false, message: 'Usuário ou senha inválidos' };
     }
   }
 
-  async function signUp(data) {
+// Função de Cadastro
+  const signUp = async (dadosPaciente) => {
     try {
-      const response = await authAPI.registerPaciente(data);
+      // 1. Fazemos a chamada para a API
+      const response = await authAPI.registerPaciente(dadosPaciente);
 
-      setUser(response);
-
-      await AsyncStorage.setItem('@agende:user', JSON.stringify(response));
-      await AsyncStorage.setItem('@agende:token', response.token);
+      // 2. A CORREÇÃO: Verificamos se o token REALMENTE veio na resposta
+      if (response && response.token) {
+        await AsyncStorage.setItem('@agende:token', response.token);
+        // setUser(response.user); // Se o backend já enviar os dados do usuário
+      } else {
+        // Se não veio token, significa que o cadastro deu certo,
+        // mas o usuário precisa ir para a tela de Login para gerar o token!
+        console.log("Cadastro realizado sem auto-login. Token não recebido.");
+      }
 
       return { success: true };
     } catch (error) {
-      // ESTA É A LINHA MÁGICA QUE VAMOS ADICIONAR:
-      //console.log("A FOFOCA DO JAVA:", error.response?.data || error.message);
-
-      // (Mantenha o resto do seu catch como estava, provavelmente tem um return ou throw)
-      //return { success: false, message: 'Erro no cadastro'
-
-      console.error('Erro no cadastro:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Erro ao criar conta. Tente novamente.'
-      };
+      console.log("Erro no cadastro:", error);
+      // Aqui garantimos que o erro é repassado para a tela mostrar o Alert, em vez de travar
+      throw error;
     }
-  }
+  };
 
   async function signOut() {
     try {

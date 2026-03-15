@@ -17,13 +17,13 @@ import SearchDoctorsScreen from '../screens/patient/SearchDoctorsScreen';
 import AppointmentsScreen from '../screens/patient/AppointmentsScreen';
 import ProfileScreen from '../screens/patient/ProfileScreen';
 import BookAppointmentScreen from '../screens/patient/BookAppointmentScreen';
-import ProfessionalProfileScreen from '../screens/patient/ProfessionalProfileScreen'; // Crie esta tela depois
+import DoctorProfileScreen from '../screens/patient/DoctorProfileScreen';
 
 // --- IMPORTAÇÃO DAS TELAS DO PROFISSIONAL ---
 import ProfessionalHomeScreen from '../screens/professional/ProfessionalHomeScreen';
 import AgendaScreen from '../screens/professional/AgendaScreen';
 import ConsultaScreen from '../screens/professional/ConsultaScreen';
-//import ProfessionalProfileScreen from '../screens/professional/DoctorProfileScreen'; // Ajuste o nome do arquivo se necessário
+import ProfessionalProfileScreen from '../screens/professional/ProfessionalProfileScreen'; // Ajuste o nome do arquivo se necessário
 import ConsultaDetailsScreen from '../screens/professional/ConsultaDetailsScreen';
 import NotificationsProfessionalScreen from '../screens/professional/NotificationsProfessionalScreen';
 
@@ -77,11 +77,9 @@ function PatientTabs() {
 function PatientRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {/* O Main engloba a barra inferior */}
       <Stack.Screen name="Main" component={PatientTabs} />
-      {/* Telas que ficam "por cima" da barra inferior */}
       <Stack.Screen name="Appointment" component={BookAppointmentScreen} />
-      {/* <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} /> */}
+      <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} />
     </Stack.Navigator>
   );
 }
@@ -119,7 +117,7 @@ function ProfessionalRoutes() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="ProfMain" component={ProfessionalTabs} />
       <Stack.Screen name="ConsultaDetails" component={ConsultaDetailsScreen} />
-      <Stack.Screen name="ProfessionalNotifications" component={NotificationsProfessionalScreen} />
+      {/*<Stack.Screen name="ProfessionalNotifications" component={NotificationsProfessionalScreen} />*/}
     </Stack.Navigator>
   );
 }
@@ -151,20 +149,10 @@ export default function Routes() {
     );
   }
 
-  // Se não estiver logado, mostra a tela de Login/Cadastro
-  if (!signed) {
-    return <AuthRoutes />;
-  }
+  if (user?.perfil === 'ADMINISTRADOR') return <AdminRoutes />;
+  if (user?.perfil === 'PROFISSIONAL') return <ProfessionalRoutes />;
+  if (user?.perfil === 'PACIENTE') return <PatientRoutes />;
 
-  // Se estiver logado, verifica o PERFIL para mostrar as telas corretas
-  if (user?.perfil === 'ADMINISTRADOR') {
-    return <AdminRoutes />;
-  }
-
-  if (user?.perfil === 'PROFISSIONAL') {
-    return <ProfessionalRoutes />;
-  }
-
-  // O padrão é cair no Paciente
-  return <PatientRoutes />;
+  // Se o perfil vier vazio ou corrompido, chuta o usuário por segurança!
+  return <AuthRoutes />;
 }

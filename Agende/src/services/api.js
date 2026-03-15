@@ -6,7 +6,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuração base da API
-const API_BASE_URL = 'http://192.168.0.3:8080/api'; // Alterar para IP do servidor em produção
+const API_BASE_URL = 'http://192.168.0.3:8088/api'; // Alterar para IP do servidor em produção
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -31,17 +31,19 @@ api.interceptors.request.use(
 );
 
 // Interceptor para tratar erros de resposta
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      // Token expirado ou inválido
-      await AsyncStorage.multiRemove(['@agende:token', '@agende:user']);
-      // Redirecionar para login (implementar navegação)
+export const setupInterceptors = (signOutCallback) => {
+  api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      if (error.response?.status === 401) {
+        // Se o Java disser que o token expirou, desloga na mesma hora!
+        await AsyncStorage.multiRemove(['@agende:token', '@agende:user']);
+        if (signOutCallback) signOutCallback();
+      }
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
-  }
-);
+  );
+};
 
 // ============================================
 // AUTENTICAÇÃO
