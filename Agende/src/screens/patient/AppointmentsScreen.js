@@ -1,5 +1,5 @@
 // screens/AppointmentsScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,75 +8,40 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
+import { consultaAPI } from '../../services/api';
 
 export default function AppointmentsScreen({ navigation }) {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('proximas');
+  const [consultasReais, setConsultasReais] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const upcomingAppointments = [
-    {
-      id: 1,
-      doctor: 'Dra. Maria Santos',
-      specialty: 'Cardiologista',
-      date: '02 Nov 2025',
-      time: '14:30',
-      type: 'presencial',
-      location: 'Hospital São Lucas - Sala 305',
-      status: 'confirmada',
-    },
-    {
-      id: 2,
-      doctor: 'Dr. Carlos Lima',
-      specialty: 'Ortopedista',
-      date: '05 Nov 2025',
-      time: '10:00',
-      type: 'online',
-      status: 'pendente',
-    },
-    {
-      id: 3,
-      doctor: 'Dra. Ana Costa',
-      specialty: 'Dermatologista',
-      date: '08 Nov 2025',
-      time: '16:00',
-      type: 'presencial',
-      location: 'Clínica Beleza & Saúde',
-      status: 'confirmada',
-    },
-  ];
+  useEffect(() => {
+    carregarMinhasConsultas();
+  }, []);
 
-  const pastAppointments = [
-    {
-      id: 4,
-      doctor: 'Dr. Pedro Alves',
-      specialty: 'Pediatra',
-      date: '20 Out 2025',
-      time: '15:00',
-      type: 'presencial',
-      status: 'concluida',
-      canReview: true,
-    },
-    {
-      id: 5,
-      doctor: 'Dra. Maria Santos',
-      specialty: 'Cardiologista',
-      date: '15 Set 2025',
-      time: '14:30',
-      type: 'online',
-      status: 'concluida',
-      reviewed: true,
-    },
-    {
-      id: 6,
-      doctor: 'Dr. João Mendes',
-      specialty: 'Clínico Geral',
-      date: '10 Set 2025',
-      time: '09:00',
-      type: 'presencial',
-      status: 'cancelada',
-    },
-  ];
+  const carregarMinhasConsultas = async () => {
+    try {
+      setLoading(true);
+      const dados = await consultaAPI.listarPorPaciente(user.perfilId);
+      // Proteção contra undefined:
+      setConsultasReais(Array.isArray(dados) ? dados : (dados?.content || []));
+    } catch (error) {
+      console.log('Erro ao carregar histórico:', error);
+      setConsultasReais([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 2. O "Truque da Separação": O React filtra a lista gigante do Java em duas pequenas!
+  const upcomingAppointments = consultasReais.filter(c => c.status === 'AGENDADA');
+  // Se o status for diferente de AGENDADA (ex: CANCELADA, CONCLUIDA, REALIZADA), vai pro Histórico
+  const pastAppointments = consultasReais.filter(c => c.status !== 'AGENDADA');
 
   const handleCancelAppointment = (appointment) => {
     Alert.alert(
@@ -154,14 +119,15 @@ export default function AppointmentsScreen({ navigation }) {
   };
 
   const getStatusText = (status) => {
-    switch (status) {
-      case 'confirmada':
+    switch (status?.toUpperCase()) {
+      case 'AGENDADA':
         return 'Confirmada';
-      case 'pendente':
+      case 'PENDENTE':
         return 'Pendente';
-      case 'concluida':
+      case 'CONCLUIDA':
+      case 'REALIZADA':
         return 'Concluída';
-      case 'cancelada':
+      case 'CANCELADA':
         return 'Cancelada';
       default:
         return status;
@@ -176,8 +142,8 @@ export default function AppointmentsScreen({ navigation }) {
             <Ionicons name="person" size={24} color="#fff" />
           </View>
           <View style={styles.doctorDetails}>
-            <Text style={styles.doctorName}>{appointment.doctor}</Text>
-            <Text style={styles.specialty}>{appointment.specialty}</Text>
+            <Text style={styles.doctorName}>{appointment.profissionalNome}</Text>
+            <Text style={styles.specialty}>{appointment.profissionalEspecialidade}</Text>
           </View>
         </View>
         <View style={[styles.statusBadge, { backgroundColor: getStatusColor(appointment.status) }]}>
@@ -188,11 +154,11 @@ export default function AppointmentsScreen({ navigation }) {
       <View style={styles.appointmentInfo}>
         <View style={styles.infoRow}>
           <Ionicons name="calendar-outline" size={18} color="#666" />
-          <Text style={styles.infoText}>{appointment.date}</Text>
+          <Text style={styles.infoText}>{appointment.dataConsulta}</Text>
         </View>
         <View style={styles.infoRow}>
           <Ionicons name="time-outline" size={18} color="#666" />
-          <Text style={styles.infoText}>{appointment.time}</Text>
+          <Text style={styles.infoText}>{appointment.horaConsulta}</Text>
         </View>
         <View style={styles.infoRow}>
           <Ionicons
@@ -207,7 +173,7 @@ export default function AppointmentsScreen({ navigation }) {
         {appointment.location && (
           <View style={styles.infoRow}>
             <Ionicons name="location-outline" size={18} color="#666" />
-            <Text style={styles.infoText}>{appointment.location}</Text>
+            <Text style={styles.infoText}>{appointment.profissionalHospital || 'Consultório Principal'}</Text>
           </View>
         )}
       </View>
@@ -298,6 +264,11 @@ export default function AppointmentsScreen({ navigation }) {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
+      {loading ? (
+           <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 50 }} />
+        ) : (
+
+        <>
         {activeTab === 'proximas' && upcomingAppointments.length > 0 && (
           <>
             {upcomingAppointments.map((appointment) =>
@@ -338,6 +309,8 @@ export default function AppointmentsScreen({ navigation }) {
               Suas consultas anteriores aparecerão aqui
             </Text>
           </View>
+        )}
+        </>
         )}
       </ScrollView>
     </View>
