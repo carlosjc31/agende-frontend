@@ -120,8 +120,18 @@ export const consultaAPI = {
 
   // Listar consultas do profissional
   listarPorProfissional: async (profissionalId) => {
-    // Nota: ajuste a rota '/consultas/profissional/' se no seu Java for diferente!
     const response = await api.get(`/consultas/profissional/${profissionalId}`);
+    return response.data;
+  },
+  // Concluir consulta
+  concluirConsulta: async (consultaId) => {
+    const response = await api.patch(`/consultas/${consultaId}/marcar-realizada`);
+    return response.data;
+  },
+
+  // Cancelar consulta
+  cancelarConsulta: async (consultaId, motivo = "Cancelado pelo profissional") => {
+    const response = await api.patch(`/consultas/${consultaId}/cancelar?motivo=${encodeURIComponent(motivo)}`);
     return response.data;
   },
 

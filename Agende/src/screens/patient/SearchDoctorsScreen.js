@@ -22,14 +22,12 @@ export default function SearchDoctorsScreen({ navigation }) {
   const [selectedSpecialty, setSelectedSpecialty] = useState('Todas');
   const [selectedFilter, setSelectedFilter] = useState('Todos');
 
-  // CAMADA DE SEGURANÇA 1: Garante que doctors seja sempre uma lista
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const specialties = ['Todas', 'Cardiologia', 'Pediatria', 'Ortopedia', 'Dermatologia'];
   const filters = ['Todos', 'Maior Avaliação', 'Mais Próximo', 'Menor Preço'];
 
-  // Busca os dados no momento em que a tela abre
   useEffect(() => {
     carregarProfissionais();
   }, []);

@@ -2,20 +2,23 @@
 // TELA HOME DO PROFISSIONAL
 // ============================================
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { consultaAPI } from '../../services/api';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ProfessionalHomeScreen({ navigation }) {
   const { user } = useAuth();
   const [ consultasReais, setConsultasReais] = useState([]);
   const [ loading, setLoading ] = useState(true);
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     carregarConsultas();
-  }, []);
+  }, [])
+  );
 
   const carregarConsultas = async () => {
     try {

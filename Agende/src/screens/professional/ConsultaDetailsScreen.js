@@ -1,20 +1,70 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { consultaAPI } from '../../services/api';
 
 export default function ConsultaDetailsScreen({ route, navigation }) {
-  const { consultaId } = route.params || {};
+  const { consulta } = route.params || {};
 
   if (!consulta) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <Text>Erro ao carregar detalhes da consulta.</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()}><Text style={{ color: '#007AFF', marginTop: 10 }}>Voltar</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={{ color: '#007AFF', marginTop: 10, fontWeight: 'bold' }}>Voltar</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
-  const statusColor = (status) => {
+  const handleConcluir = () => {
+    Alert.alert(
+      'Concluir Consulta',
+      'Tem certeza de que deseja marcar esta consulta como realizada?',
+      [
+        { text: 'Não', style: 'cancel' },
+        {
+          text: 'Sim, concluir',
+          onPress: async () => {
+            try {
+              await consultaAPI.concluirConsulta(consulta.id);
+              Alert.alert('Sucesso', 'Consulta finalizada com sucesso!');
+              navigation.goBack();
+            } catch (error) {
+              console.log("Erro ao concluir:", error);
+              Alert.alert('Erro', 'Não foi possível atualizar a consulta.');
+            }
+          }
+        },
+      ]
+    );
+  };
+
+  const handleCancelar = () => {
+    Alert.alert(
+      'Cancelar Consulta',
+      'Tem certeza de que deseja cancelar esta consulta? O paciente será notificado.',
+      [
+        { text: 'Voltar', style: 'cancel' },
+        {
+          text: 'Sim, cancelar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await consultaAPI.cancelarConsulta(consulta.id);
+              Alert.alert('Cancelada', 'A consulta foi cancelada com sucesso.');
+              navigation.goBack();
+            } catch (error) {
+              console.log("Erro ao cancelar:", error);
+              Alert.alert('Erro', 'Não foi possível cancelar a consulta.');
+            }
+          }
+        },
+      ]
+    );
+  };
+
+      const statusColor = (status) => {
     switch (status?.toUpperCase()) {
       case 'AGENDADA': return '#34C759';
       case 'PENDENTE': return '#FF9500';
@@ -23,9 +73,6 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
       default: return '#8E8E93';
     }
   };
-
-  const handleConcluir = () => Alert.alert('Em breve', 'Irá chamar a API do Java para marcar como Concluída.');
-  const handleCancelar = () => Alert.alert('Em breve', 'Irá chamar a API do Java para Cancelar.');
 
   return (
     <View style={styles.container}>
