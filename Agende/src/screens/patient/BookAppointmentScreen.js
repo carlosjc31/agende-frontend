@@ -68,9 +68,13 @@ export default function BookAppointmentScreen({ navigation, route }) {
           onPress: async() => {
             // Aqui faz a chamada à API para agendar
             try {
-              const dataFormatada = selectedDate.fullDate.toISOString().split('T')[0];
-              const requestData ={
-                //pacienteId: user.perfilId,
+              const dataObj = selectedDate.fullDate;
+              const ano = dataObj.getFullYear();
+              const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+              const dia = String(dataObj.getDate()).padStart(2, '0');
+              const dataFormatada = `${ano}-${mes}-${dia}`; // Formato perfeito para o Java (YYYY-MM-DD)
+
+              const requestData = {
                 profissionalId: doctor.id,
                 dataConsulta: dataFormatada,
                 horaConsulta: `${selectedTime}:00`,

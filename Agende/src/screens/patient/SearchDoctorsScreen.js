@@ -65,9 +65,9 @@ const carregarProfissionais = async () => {
   };
 
   // CAMADA DE SEGURANÇA 2: Garante que doctors é sempre uma lista antes de filtrar
-  const safeDoctors = Array.isArray(doctors) ? doctors : [];
+    const safeDoctors = Array.isArray(doctors) ? doctors : [];
 
-  const filteredDoctors = safeDoctors.filter(doctor => {
+    const filteredDoctors = safeDoctors.filter(doctor => {
     const nome = doctor.nomeCompleto || doctor.nome || '';
     const especialidade = doctor.especialidade || '';
 

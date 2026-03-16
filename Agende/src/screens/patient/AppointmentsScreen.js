@@ -28,7 +28,6 @@ export default function AppointmentsScreen({ navigation }) {
     try {
       setLoading(true);
       const dados = await consultaAPI.listarPorPaciente(user.perfilId);
-      // Proteção contra undefined:
       setConsultasReais(Array.isArray(dados) ? dados : (dados?.content || []));
     } catch (error) {
       console.log('Erro ao carregar histórico:', error);
@@ -38,9 +37,7 @@ export default function AppointmentsScreen({ navigation }) {
     }
   };
 
-  // 2. O "Truque da Separação": O React filtra a lista gigante do Java em duas pequenas!
   const upcomingAppointments = consultasReais.filter(c => c.status === 'AGENDADA');
-  // Se o status for diferente de AGENDADA (ex: CANCELADA, CONCLUIDA, REALIZADA), vai pro Histórico
   const pastAppointments = consultasReais.filter(c => c.status !== 'AGENDADA');
 
   const handleCancelAppointment = (appointment) => {

@@ -2,50 +2,68 @@
 // TELA DE VALIDAÇÃO DE PROFISSIONAIS (ADMIN)
 // ============================================
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { adminAPI } from '../../services/api';
 
 export default function ValidarProfissionalScreen() {
-  const [items, setItems] = useState(
-    useMemo(
-      () => [
-        { id: 'p1', name: 'Dra. Ana Costa', specialty: 'Dermatologia', crm: 'CRM-SP 889911', status: 'pendente' },
-        { id: 'p2', name: 'Dr. Carlos Lima', specialty: 'Ortopedia', crm: 'CRM-SP 112233', status: 'pendente' },
-        { id: 'p3', name: 'Dra. Marina Souza', specialty: 'Pediatria', crm: 'CRM-SP 445566', status: 'pendente' },
-      ],
-      []
-    )
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  //const pendingCount = items.filter((p) => p.status === 'pendente').length;
+  useFocusEffect(
+    useCallback(() => {
+      carregarPendentes();
+    }, [])
   );
 
-  const pendingCount = items.filter((p) => p.status === 'pendente').length;
+  const carregarPendentes = async () => {
+    try {
+      setLoading(true);
+      const dados = await adminAPI.listarPendentes();
+      setItems(Array.isArray(dados) ? dados : (dados?.content || []));
+    } catch (error) {
+      console.log('Erro ao buscar pendentes:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os cadastros.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleApprove = (id) => {
-    Alert.alert('Aprovar', 'Deseja aprovar este profissional?', [
+  const handleApprove = (id, nome) => {
+    Alert.alert('Aprovar', `Deseja aprovar o cadastro de ${nome}?`, [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Aprovar',
-        onPress: () => {
-          setItems((prev) =>
-            prev.map((p) => (p.id === id ? { ...p, status: 'aprovado' } : p))
-          );
-          Alert.alert('Sucesso', 'Profissional aprovado!');
+        onPress: async () => {
+          try {
+            await adminAPI.aprovar(id);
+            Alert.alert('Sucesso', 'Profissional aprovado e liberado para agendamentos!');
+            carregarPendentes(); // Recarrega a lista para remover o médico da tela
+          } catch (error) {
+            Alert.alert('Erro', 'Não foi possível aprovar o profissional.');
+          }
         },
       },
     ]);
   };
 
-  const handleReject = (id) => {
-    Alert.alert('Rejeitar', 'Deseja rejeitar este profissional?', [
+  const handleReject = (id, nome) => {
+    Alert.alert('Rejeitar', `Deseja realmente rejeitar e excluir o cadastro de ${nome}?`, [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Rejeitar',
         style: 'destructive',
-        onPress: () => {
-          setItems((prev) =>
-            prev.map((p) => (p.id === id ? { ...p, status: 'rejeitado' } : p))
-          );
-          Alert.alert('Concluído', 'Cadastro rejeitado.');
+        onPress: async () => {
+          try {
+            await adminAPI.rejeitar(id);
+            Alert.alert('Concluído', 'Cadastro rejeitado e removido do sistema.');
+            carregarPendentes(); // Recarrega a lista
+          } catch (error) {
+            Alert.alert('Erro', 'Não foi possível rejeitar o profissional.');
+          }
         },
       },
     ]);
@@ -89,63 +107,51 @@ export default function ValidarProfissionalScreen() {
       <View style={styles.summaryRow}>
         <View style={styles.summaryCard}>
           <Ionicons name="alert-circle-outline" size={22} color="#FF9500" />
-          <Text style={styles.summaryNumber}>{pendingCount}</Text>
-          <Text style={styles.summaryLabel}>Pendentes</Text>
-        </View>
-
-        <View style={styles.summaryCard}>
-          <Ionicons name="shield-checkmark-outline" size={22} color="#007AFF" />
           <Text style={styles.summaryNumber}>{items.length}</Text>
-          <Text style={styles.summaryLabel}>Total</Text>
+          <Text style={styles.summaryLabel}>Pendentes</Text>
         </View>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {items.length === 0 && (
+        {loading ? (
+          <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 50 }} />
+        ) : items.length === 0 ? (
           <View style={styles.empty}>
             <Ionicons name="checkmark-done-outline" size={56} color="#C7C7CC" />
-            <Text style={styles.emptyTitle}>Sem cadastros</Text>
-            <Text style={styles.emptySub}>Nenhum profissional aguardando validação.</Text>
+            <Text style={styles.emptyTitle}>Sem cadastros pendentes</Text>
+            <Text style={styles.emptySub}>A sua plataforma está em dia!</Text>
           </View>
-        )}
-
-        {items.map((p) => (
-          <View key={p.id} style={styles.card}>
-            <View style={styles.cardTop}>
-              <View style={styles.avatar}>
-                <Ionicons name="medkit" size={18} color="#fff" />
+        ) : (
+          items.map((p) => (
+            <View key={p.id} style={styles.card}>
+              <View style={styles.cardTop}>
+                <View style={styles.avatar}>
+                  <Ionicons name="medkit" size={18} color="#fff" />
+                </View>
+                <View style={styles.info}>
+                  <Text style={styles.name}>{p.nomeCompleto || p.nome}</Text>
+                  <Text style={styles.meta}>{p.especialidade} • {p.crm || 'CRM não informado'}</Text>
+                </View>
+                <View style={[styles.statusPill, { backgroundColor: '#FF9500' }]}>
+                  <Text style={styles.statusText}>Aguardando</Text>
+                </View>
               </View>
 
-              <View style={styles.info}>
-                <Text style={styles.name}>{p.name}</Text>
-                <Text style={styles.meta}>{p.specialty} • {p.crm}</Text>
-              </View>
-
-              <View style={[styles.statusPill, { backgroundColor: statusColor(p.status) }]}>
-                <Text style={styles.statusText}>{statusLabel(p.status)}</Text>
-              </View>
-            </View>
-
-            {p.status === 'pendente' ? (
               <View style={styles.actionsRow}>
-                <TouchableOpacity style={[styles.actionBtn, styles.approveBtn]} onPress={() => handleApprove(p.id)}>
+                {/* Enviamos o ID e o NOME para o Alerta ficar mais amigável */}
+                <TouchableOpacity style={[styles.actionBtn, styles.approveBtn]} onPress={() => handleApprove(p.id, p.nomeCompleto)}>
                   <Ionicons name="checkmark" size={18} color="#fff" />
                   <Text style={styles.actionText}>Aprovar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.actionBtn, styles.rejectBtn]} onPress={() => handleReject(p.id)}>
+                <TouchableOpacity style={[styles.actionBtn, styles.rejectBtn]} onPress={() => handleReject(p.id, p.nomeCompleto)}>
                   <Ionicons name="close" size={18} color="#fff" />
                   <Text style={styles.actionText}>Rejeitar</Text>
                 </TouchableOpacity>
               </View>
-            ) : (
-              <View style={styles.doneRow}>
-                <Ionicons name="information-circle-outline" size={16} color="#666" />
-                <Text style={styles.doneText}>Este cadastro já foi {statusLabel(p.status).toLowerCase()}.</Text>
-              </View>
-            )}
-          </View>
-        ))}
+            </View>
+          ))
+        )}
       </ScrollView>
     </View>
   );

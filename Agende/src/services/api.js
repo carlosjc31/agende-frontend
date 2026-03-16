@@ -107,8 +107,8 @@ export const profissionalAPI = {
 
 export const consultaAPI = {
   // Agendar consulta
-  agendar: async (pacienteId, dados) => {
-    const response = await api.post(`/consultas/agendar/${pacienteId}`, dados);
+  agendar: async (pacienteId, dadosConsulta) => {
+    const response = await api.post(`/consultas/agendar/${pacienteId}`, dadosConsulta);
     return response.data;
   },
 
@@ -190,6 +190,29 @@ export const notificacaoAPI = {
     const response = await api.patch(`/notificacoes/${notificacaoId}/marcar-lida`);
     return response.data;
   },
+};
+
+
+// ============================================
+// Adminastrador de Usuários
+// ============================================
+
+export const adminAPI = {
+  // Busca a lista de médicos esperando aprovação
+  listarPendentes: async () => {
+    const response = await api.get('/profissionais/pendentes');
+    return response.data;
+  },
+  // Manda o Java aprovar
+  aprovar: async (id) => {
+    const response = await api.patch(`/profissionais/${id}/aprovar`);
+    return response.data;
+  },
+  // Manda o Java rejeitar/excluir
+  rejeitar: async (id) => {
+    const response = await api.patch(`/profissionais/${id}/rejeitar`);
+    return response.data;
+  }
 };
 
 export default api;
