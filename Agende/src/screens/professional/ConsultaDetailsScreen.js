@@ -1,42 +1,31 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ConsultaDetailsScreen({ route, navigation }) {
   const { consultaId } = route.params || {};
-  // placeholder
-  const consulta = useMemo(
-    () => ({
-      id: consultaId || 'c1',
-      paciente: 'João Silva',
-      data: 'Hoje',
-      hora: '14:30',
-      tipo: 'Presencial',
-      status: 'confirmada',
-      motivo: 'Dor no peito',
-      observacoes: 'Paciente relata episódios recentes durante esforço.',
-      local: 'Clínica Centro - Sala 305',
-    }),
-    [consultaId]
-  );
-  
+
+  if (!consulta) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text>Erro ao carregar detalhes da consulta.</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}><Text style={{ color: '#007AFF', marginTop: 10 }}>Voltar</Text></TouchableOpacity>
+      </View>
+    );
+  }
+
   const statusColor = (status) => {
-    switch (status) {
-      case 'confirmada':
-        return '#34C759';
-      case 'pendente':
-        return '#FF9500';
-      case 'concluida':
-        return '#007AFF';
-      case 'cancelada':
-        return '#FF3B30';
-      default:
-        return '#8E8E93';
+    switch (status?.toUpperCase()) {
+      case 'AGENDADA': return '#34C759';
+      case 'PENDENTE': return '#FF9500';
+      case 'CONCLUIDA': case 'REALIZADA': return '#007AFF';
+      case 'CANCELADA': return '#FF3B30';
+      default: return '#8E8E93';
     }
   };
 
-  const handleConcluir = () => Alert.alert('Em breve', 'Marcar consulta como concluída (placeholder).');
-  const handleCancelar = () => Alert.alert('Em breve', 'Cancelar consulta (placeholder).');
+  const handleConcluir = () => Alert.alert('Em breve', 'Irá chamar a API do Java para marcar como Concluída.');
+  const handleCancelar = () => Alert.alert('Em breve', 'Irá chamar a API do Java para Cancelar.');
 
   return (
     <View style={styles.container}>
@@ -57,8 +46,8 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
               <Ionicons name="person" size={22} color="#fff" />
             </View>
             <View style={styles.info}>
-              <Text style={styles.name}>{consulta.paciente}</Text>
-              <Text style={styles.meta}>{consulta.data} • {consulta.hora} • {consulta.tipo}</Text>
+              <Text style={styles.name}>{consulta.pacienteNome}</Text>
+              <Text style={styles.meta}>{consulta.dataConsulta} • {consulta.horaConsulta} • {consulta.motivoConsulta || 'Presencial'}</Text>
             </View>
             <View style={[styles.status, { backgroundColor: statusColor(consulta.status) }]}>
               <Text style={styles.statusText}>{consulta.status}</Text>
@@ -67,12 +56,12 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
 
           <View style={styles.detailRow}>
             <Ionicons name="location-outline" size={18} color="#666" />
-            <Text style={styles.detailText}>{consulta.local}</Text>
+            <Text style={styles.detailText}>{consulta.profissionalHospital || 'Consultório Principal'}</Text>
           </View>
 
           <View style={styles.detailRow}>
             <Ionicons name="chatbubbles-outline" size={18} color="#666" />
-            <Text style={styles.detailText}>Motivo: {consulta.motivo}</Text>
+            <Text style={styles.detailText}>Motivo: {consulta.motivoConsulta || 'Rotina'}</Text>
           </View>
 
           <View style={styles.notesBox}>

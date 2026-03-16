@@ -2,43 +2,65 @@
 // TELA DE CONSULTAS DO PROFISSIONAL
 // ============================================
 
-import React, { useMemo, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert } from 'react-native';
+import React, { useMemo, useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
+import { consultaAPI } from '../../services/api';
 
 export default function ConsultaScreen({ navigation }) {
+  const { user } = useAuth();
   const [tab, setTab] = useState('hoje');
+  const [consultasReais, setConsultasReais] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const data = useMemo(
-    () => ({
-      hoje: [
-        { id: 'c1', paciente: 'João Silva', data: 'Hoje', hora: '14:30', tipo: 'Presencial', status: 'confirmada' },
-        { id: 'c2', paciente: 'Maria Oliveira', data: 'Hoje', hora: '15:00', tipo: 'Online', status: 'pendente' },
-      ],
-      proximas: [
-        { id: 'c3', paciente: 'Carlos Pereira', data: 'Amanhã', hora: '09:00', tipo: 'Presencial', status: 'confirmada' },
-        { id: 'c4', paciente: 'Ana Souza', data: '18 Jan', hora: '11:00', tipo: 'Online', status: 'confirmada' },
-      ],
-      historico: [
-        { id: 'c5', paciente: 'Pedro Lima', data: '10 Jan', hora: '10:30', tipo: 'Presencial', status: 'concluida' },
-        { id: 'c6', paciente: 'Marina Costa', data: '08 Jan', hora: '16:00', tipo: 'Online', status: 'cancelada' },
-      ],
-    }),
-    []
-  );
+  useEffect(() => {
+    carregarConsultas();
+  }, []);
+
+  const carregarConsultas = async () => {
+    try {
+      setLoading(true);
+      const dados = await consultaAPI.listarPorProfissional(user.perfilId);
+      setConsultasReais(Array.isArray(dados) ? dados : (dados?.content || []));
+    } catch (error) {
+      console.log('Erro ao carregar consultas da médica:', error);
+      setConsultasReais([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const data = useMemo(() => {
+    const hojeLocal = new Date();
+    const hojeFormatado = hojeLocal.toISOString().split('T')[0];
+
+    const hoje = [];
+    const proximas = [];
+    const historico = [];
+
+    consultasReais.forEach(c => {
+      const statusNormal = c.status?.toUpperCase();
+
+      if (statusNormal === 'CANCELADA' || statusNormal === 'CONCLUIDA' || statusNormal === 'REALIZADA' || c.dataConsulta < hojeFormatado) {
+        historico.push(c);
+      } else if (c.dataConsulta === hojeFormatado) {
+        hoje.push(c);
+      } else if (c.dataConsulta > hojeFormatado) {
+        proximas.push(c);
+      }
+    });
+
+    return { hoje, proximas, historico };
+  }, [consultasReais]);
 
   const statusColor = (status) => {
-    switch (status) {
-      case 'confirmada':
-        return '#34C759';
-      case 'pendente':
-        return '#FF9500';
-      case 'concluida':
-        return '#007AFF';
-      case 'cancelada':
-        return '#FF3B30';
-      default:
-        return '#8E8E93';
+    switch (status?.toUpperCase()) {
+      case 'AGENDADA': return '#34C759'; // Verde
+      case 'PENDENTE': return '#FF9500'; // Laranja
+      case 'CONCLUIDA': case 'REALIZADA': return '#007AFF'; // Azul
+      case 'CANCELADA': return '#FF3B30'; // Vermelho
+      default: return '#8E8E93';
     }
   };
 
@@ -49,11 +71,8 @@ export default function ConsultaScreen({ navigation }) {
   }[tab];
 
   const handleQuickAction = (item) => {
-    if (item.status === 'pendente') {
-      Alert.alert('Pendente', 'Em breve: aprovar/rejeitar consulta.');
-      return;
-    }
-    navigation.navigate('ConsultaDetails', { consultaId: item.id });
+    // Truque Ninja: Passamos o objeto inteiro "item" para a tela de detalhes!
+    navigation.navigate('ConsultaDetails', { consulta: item });
   };
 
   const renderCard = (c) => (
@@ -64,12 +83,14 @@ export default function ConsultaScreen({ navigation }) {
         </View>
 
         <View style={styles.info}>
-          <Text style={styles.name}>{c.paciente}</Text>
-          <Text style={styles.meta}>{c.data} • {c.hora} • {c.tipo}</Text>
+          {/* Usando os nomes reais que o Java envia! */}
+          <Text style={styles.name}>{c.pacienteNome}</Text>
+          <Text style={styles.meta}>{c.dataConsulta} • {c.horaConsulta} • {c.motivoConsulta || 'Presencial'}</Text>
         </View>
 
         <View style={[styles.status, { backgroundColor: statusColor(c.status) }]}>
-          <Text style={styles.statusText}>{c.status}</Text>
+          {/* Mostramos o status real, mas limitamos para ficar bonito no cartão pequeno */}
+          <Text style={styles.statusText}>{c.status === 'AGENDADA' ? 'Confirmada' : c.status}</Text>
         </View>
       </View>
 
@@ -106,6 +127,7 @@ export default function ConsultaScreen({ navigation }) {
             <Ionicons name="calendar-outline" size={60} color="#C7C7CC" />
             <Text style={styles.emptyTitle}>{emptyText}</Text>
             <Text style={styles.emptySub}>As consultas aparecerão aqui quando existirem.</Text>
+            <ActivityIndicator size="large" color="#007AFF" style={{marginTop: 50}} />
           </View>
         )}
       </ScrollView>

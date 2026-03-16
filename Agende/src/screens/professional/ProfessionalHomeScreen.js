@@ -42,33 +42,61 @@ export default function ProfessionalHomeScreen({ navigation }) {
     }
   };
 
-  const professional = useMemo(
-    () => ({
-      name: 'Dra. Maria Santos',
-      specialty: 'Cardiologia',
-      rating: 4.9,
-    }),
-    []
-  );
+  // 1. Dados Reais da Médica
+  const professional = useMemo(() => {
+    return {
+      name: user?.nome || 'Profissional', // Puxa o nome real do Java!
+      // Truque Ninja: Se ela tem consultas, puxamos a especialidade da primeira consulta. Se não, mostramos genérico.
+      specialty: consultasReais?.length > 0 ? consultasReais[0].profissionalEspecialidade : 'Especialista',
+      rating: 4.9, // Deixamos fixo até você criar a tabela de avaliações no futuro
+    };
+  }, [user, consultasReais]); // O React atualiza sozinho se o user ou as consultas mudarem!
 
-  const stats = useMemo(
-    () => ({
-      today: 6,
-      week: 28,
-      pending: 3,
-      cancelled: 1,
-    }),
-    []
-  );
 
-  const nextConsultas = useMemo(
-    () => [
-      { id: 'c1', paciente: 'João Silva', data: 'Hoje', hora: '14:30', tipo: 'Presencial', status: 'confirmada' },
-      { id: 'c2', paciente: 'Maria Oliveira', data: 'Hoje', hora: '15:00', tipo: 'Online', status: 'pendente' },
-      { id: 'c3', paciente: 'Carlos Pereira', data: 'Amanhã', hora: '09:00', tipo: 'Presencial', status: 'confirmada' },
-    ],
-    []
-  );
+  // 2. Matemática Real das Estatísticas
+  const stats = useMemo(() => {
+    // Se a lista estiver vazia ou a carregar, zera tudo
+    if (!consultasReais || consultasReais.length === 0) {
+      return { today: 0, week: 0, pending: 0, cancelled: 0 };
+    }
+
+    // Pega a data de hoje no formato YYYY-MM-DD (igual ao que o banco de dados usa)
+    const hojeLocal = new Date();
+    const hojeFormatado = hojeLocal.toISOString().split('T')[0];
+
+    let todayCount = 0;
+    let pendingCount = 0;
+    let cancelledCount = 0;
+
+    consultasReais.forEach(consulta => {
+      // 1. Quantas são hoje?
+      if (consulta.dataConsulta === hojeFormatado) todayCount++;
+
+      // 2. Quantas estão agendadas para o futuro?
+      if (consulta.status === 'AGENDADA' || consulta.status === 'PENDENTE') pendingCount++;
+
+      // 3. Quantas foram canceladas?
+      if (consulta.status === 'CANCELADA') cancelledCount++;
+    });
+
+    return {
+      today: todayCount,
+      week: consultasReais.length, // Consideramos o total da lista como as consultas da semana/mês
+      pending: pendingCount,
+      cancelled: cancelledCount,
+    };
+  }, [consultasReais]);
+
+  // 3. Próximas Consultas (Resumo para a Home)
+  const nextConsultas = useMemo(() => {
+    if (!consultasReais) return [];
+
+    // Filtra para mostrar apenas as consultas que ainda vão acontecer
+    // e recorta (slice) para mostrar no máximo as 3 primeiras na tela Home!
+    return consultasReais
+      .filter(consulta => consulta.status === 'AGENDADA' || consulta.status === 'PENDENTE')
+      .slice(0, 3);
+  }, [consultasReais]);
 
   const statusColor = (status) => {
     switch (status) {
@@ -159,10 +187,10 @@ export default function ProfessionalHomeScreen({ navigation }) {
 
         {loading ? (
            <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />
-        ) : consultasReais?.length === 0 ? (
-           <Text style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>Nenhuma consulta agendada.</Text>
+        ) : nextConsultas?.length === 0 ? (
+           <Text style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>Nenhuma consulta agendada para os próximos dias.</Text>
         ) : (
-           consultasReais?.map((consulta, index) => (
+           nextConsultas?.map((consulta, index) => (
             <View key={consulta.id || index} style={styles.appointmentCard}>
               {/* ATENÇÃO AOS NOMES DAS VARIÁVEIS AQUI */}
               {/* Verifique se o Java devolve paciente.nome ou nomePaciente */}
