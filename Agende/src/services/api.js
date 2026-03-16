@@ -118,6 +118,7 @@ export const consultaAPI = {
     return response.data;
   },
 
+  // Listar consultas do profissional
   listarPorProfissional: async (profissionalId) => {
     // Nota: ajuste a rota '/consultas/profissional/' se no seu Java for diferente!
     const response = await api.get(`/consultas/profissional/${profissionalId}`);

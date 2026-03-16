@@ -8,20 +8,69 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { consultaAPI } from '../../services/api';
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
   const userName = user?.name || user?.nome_completo || 'Paciente';
-  const [nextAppointment, setNextAppointment] = useState({
-    doctor: 'Dra. Maria Santos',
-    specialty: 'Cardiologista',
-    date: '02 Nov 2025',
-    time: '14:30',
-    location: 'Consultório Centro',
-  });
+
+  const [nextAppointment, setNextAppointment] = useState(null);
+  const [recentDoctors, setRecentDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    carregarDadosIniciais();
+  }, []);
+
+
+  const carregarDadosIniciais = async () => {
+    try {
+      setLoading(true);
+      console.log("Buscando dados da Home para o paciente:", user.perfilId);
+
+      // AQUI ENTRARÃO AS CHAMADAS REAIS PARA A API!
+      // Exemplo (vamos ajustar os nomes exatos no próximo passo):
+      const consultas = await consultaAPI.listarPorPaciente(user.perfilId);
+      console.log("Consultas recebidas:", consultas.length);
+      // const profissionais = await api.get('/profissionais/recentes');
+      // 2. Filtrar apenas as "AGENDADAS" para ser a próxima consulta
+      const consultasAgendadas = consultas.filter(c => c.status === 'AGENDADA');
+
+      if (consultasAgendadas.length > 0) {
+        // Pega a primeira da lista
+        setNextAppointment(consultasAgendadas[0]);
+      } else {
+        setNextAppointment(null);
+      }
+
+      const medicosUnicos = [];
+      const mapIds = new Set(); // Para não repetir o mesmo médico duas vezes
+
+      consultas.forEach(consulta => {
+        if (!mapIds.has(consulta.profissionalId)) {
+          mapIds.add(consulta.profissionalId);
+          medicosUnicos.push({
+            id: consulta.profissionalId,
+            name: consulta.profissionalNome, // Veio do Java ontem!
+            specialty: consulta.profissionalEspecialidade,
+            rating: 5.0, // Fixo por enquanto, até termos tabela de avaliações
+            image: consulta.profissionalFoto || 'https://via.placeholder.com/100',
+          });
+        }
+      });
+
+      setRecentDoctors(medicosUnicos);
+
+    } catch (error) {
+      console.log("Erro ao carregar Home do Paciente:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const specialties = [
     { id: 1, name: 'Cardiologia', icon: 'heart', color: '#FF6B6B' },
@@ -30,22 +79,6 @@ export default function HomeScreen({ navigation }) {
     { id: 4, name: 'Dermatologia', icon: 'eye', color: '#95E1D3' },
   ];
 
-  const recentDoctors = [
-    {
-      id: 1,
-      name: 'Dr. Carlos Lima',
-      specialty: 'Ortopedista',
-      rating: 4.8,
-      image: 'https://via.placeholder.com/100',
-    },
-    {
-      id: 2,
-      name: 'Dra. Ana Costa',
-      specialty: 'Dermatologista',
-      rating: 4.9,
-      image: 'https://via.placeholder.com/100',
-    },
-  ];
 
   return (
     <View style={styles.container}>
@@ -68,38 +101,25 @@ export default function HomeScreen({ navigation }) {
         style={styles.scrollView}
       >
         {/* Próxima Consulta */}
-        {nextAppointment && (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.cardTitle}>Próxima Consulta</Text>
+        </View>
+
+        {loading ? (
+           <ActivityIndicator size="large" color="#007AFF" style={{ marginVertical: 20 }} />
+        ) : nextAppointment ? (
           <View style={styles.appointmentCard}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Próxima Consulta</Text>
-              <Ionicons name="calendar" size={20} color="#007AFF" />
-            </View>
-            <View style={styles.appointmentDetails}>
-              <View style={styles.doctorInfo}>
-                <View style={styles.avatarPlaceholder}>
-                  <Ionicons name="person" size={30} color="#fff" />
-                </View>
-                <View style={styles.doctorText}>
-                  <Text style={styles.doctorName}>{nextAppointment.doctor}</Text>
-                  <Text style={styles.doctorSpecialty}>{nextAppointment.specialty}</Text>
-                </View>
-              </View>
-              <View style={styles.appointmentTime}>
-                <View style={styles.timeRow}>
-                  <Ionicons name="calendar-outline" size={16} color="#666" />
-                  <Text style={styles.timeText}>{nextAppointment.date}</Text>
-                </View>
-                <View style={styles.timeRow}>
-                  <Ionicons name="time-outline" size={16} color="#666" />
-                  <Text style={styles.timeText}>{nextAppointment.time}</Text>
-                </View>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={styles.viewButton}
-              onPress={() => navigation.navigate('Appointments')}
-            >
-              <Text style={styles.viewButtonText}>Ver Detalhes</Text>
+            {/* ... (Pode manter o conteúdo do seu cartão aqui, apenas adicione a interrogação mágica nas variáveis) ... */}
+            <Text style={styles.doctorName}>{nextAppointment?.profissionalNome}</Text>
+            <Text style={styles.doctorSpecialty}>{nextAppointment?.profissionalEspecialidade}</Text>
+            {/* Ajuste as datas para os nomes que o Java devolve (ex: dataConsulta) */}
+          </View>
+        ) : (
+          <View style={[styles.appointmentCard, { alignItems: 'center', paddingVertical: 30 }]}>
+            <Ionicons name="calendar-clear-outline" size={40} color="#ccc" />
+            <Text style={{ marginTop: 10, color: '#666' }}>Você não tem consultas agendadas.</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Search')} style={{ marginTop: 15 }}>
+              <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Agendar Agora</Text>
             </TouchableOpacity>
           </View>
         )}
