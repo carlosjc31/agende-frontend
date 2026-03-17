@@ -18,6 +18,7 @@ import AppointmentsScreen from '../screens/patient/AppointmentsScreen';
 import ProfileScreen from '../screens/patient/ProfileScreen';
 import BookAppointmentScreen from '../screens/patient/BookAppointmentScreen';
 import DoctorProfileScreen from '../screens/patient/DoctorProfileScreen';
+import PatientNotificationsScreen from '../screens/patient/PatientNotificationsScreen';
 
 // --- IMPORTAÇÃO DAS TELAS DO PROFISSIONAL ---
 import ProfessionalHomeScreen from '../screens/professional/ProfessionalHomeScreen';
@@ -81,6 +82,7 @@ function PatientRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Main" component={PatientTabs} />
+      <Stack.Screen name="PatientNotifications" component={PatientNotificationsScreen} />
       <Stack.Screen name="Appointment" component={BookAppointmentScreen} />
       <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} />
     </Stack.Navigator>
@@ -118,8 +120,8 @@ function ProfessionalTabs() {
 function ProfessionalRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="ProfMain" component={ProfessionalTabs} />
-      <Stack.Screen name="ConsultaDetails" component={ConsultaDetailsScreen} />
+      <Stack.Screen name="Main" component={ProfessionalTabs} />
+      <Stack.Screen name="Notificações" component={NotificationsProfessionalScreen} />
       {/*<Stack.Screen name="ProfessionalNotifications" component={NotificationsProfessionalScreen} />*/}
     </Stack.Navigator>
   );

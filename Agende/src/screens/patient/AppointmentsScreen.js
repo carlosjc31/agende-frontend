@@ -169,7 +169,7 @@ export default function AppointmentsScreen({ navigation }) {
               {activeTab === 'proximas' && (
                 <TouchableOpacity
                   style={styles.bookButton}
-                  onPress={() => navigation.navigate('SearchDoctorsScreen')}
+                  onPress={() => navigation.navigate('Search')}
                 >
                   <Text style={styles.bookButtonText}>Agendar Nova Consulta</Text>
                 </TouchableOpacity>

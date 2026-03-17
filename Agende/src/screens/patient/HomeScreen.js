@@ -85,7 +85,7 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.greeting}>Olá, {userName}!</Text>
           <Text style={styles.subtitle}>Como podemos ajudar hoje?</Text>
         </View>
-        <TouchableOpacity style={styles.notificationButton}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('PatientNotifications')}>
           <Ionicons name="notifications-outline" size={24} color="#333" />
           <View style={styles.badge} />
         </TouchableOpacity>
@@ -97,6 +97,7 @@ export default function HomeScreen({ navigation }) {
       >
         {/* Próxima Consulta */}
         <View style={styles.sectionHeader}>
+
           <Text style={styles.sectionTitle}>Próxima Consulta</Text>
         </View>
 
@@ -219,24 +220,6 @@ export default function HomeScreen({ navigation }) {
           )}
         </View>
 
-        {/* Ações Rápidas */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ações Rápidas</Text>
-          <View style={styles.quickActions}>
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="document-text-outline" size={24} color="#007AFF" />
-              <Text style={styles.actionText}>Exames</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="medkit-outline" size={24} color="#007AFF" />
-              <Text style={styles.actionText}>Receitas</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="videocam-outline" size={24} color="#007AFF" />
-              <Text style={styles.actionText}>Telemedicina</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
       </ScrollView>
     </View>
   );

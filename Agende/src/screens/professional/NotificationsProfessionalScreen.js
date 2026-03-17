@@ -1,31 +1,85 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
+import api from '../../services/api';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function NotificationsProfessionalScreen() {
+  const { user } = useAuth();
   const [filter, setFilter] = useState('todas');
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const notifications = useMemo(
-    () => [
-      { id: 'n1', type: 'consulta', title: 'Nova consulta solicitada', message: 'Maria Oliveira pediu agendamento para hoje 15:00.', time: 'Agora', unread: true },
-      { id: 'n2', type: 'avaliacao', title: 'Nova avaliação recebida', message: 'João Silva avaliou sua consulta com 5 estrelas.', time: '2h', unread: true },
-      { id: 'n3', type: 'sistema', title: 'Atualização do sistema', message: 'Melhorias de performance aplicadas.', time: 'Ontem', unread: false },
-    ],
-    []
+  // Carrega as notificações sempre que a tela ganha foco
+  useFocusEffect(
+    useCallback(() => {
+      carregarNotificacoes();
+    }, [])
   );
-  // em breve
-  const icon = (type) => {
-    switch (type) {
-      case 'consulta':
-        return 'calendar-outline';
-      case 'avaliacao':
-        return 'star-outline';
-      default:
-        return 'information-circle-outline';
+
+  const carregarNotificacoes = async () => {
+    try {
+      setLoading(true);
+      console.log("Buscando notificações para o Usuário ID:", user.id);
+      // Usamos o user.id (que é o ID da tabela Usuario) para bater com a rota do seu Java
+      const response = await api.get(`/notificacoes/usuario/${user.id}`);
+
+      console.log("Dados que o Java enviou:", response.data);
+
+      const listaSegura = Array.isArray(response.data) ? response.data : [];
+
+      // Ordena para que as mais recentes apareçam primeiro
+      listaSegura.sort((a, b) => new Date(b.dataEnvio) - new Date(a.dataEnvio));
+
+      setNotifications(listaSegura);
+    } catch (error) {
+      console.log("Erro ao buscar notificações:", error);
+      setNotifications([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filtered = notifications.filter((n) => (filter === 'naoLidas' ? n.unread : true));
+  const marcarComoLida = async (id, jaLida) => {
+    if (jaLida) return; // Se já foi lida, não faz nada
+
+    try {
+      // Atualiza localmente na hora para dar feedback rápido (Optimistic UI)
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, lida: true } : n));
+
+      // Envia para o servidor usando o verbo PATCH e a rota correta do Controller!
+      await api.patch(`/notificacoes/${id}/marcar-lida`);
+    } catch (error) {
+      console.log("Erro ao marcar como lida:", error);
+      // Se der erro no servidor, volta a recarregar a lista real
+      carregarNotificacoes();
+    }
+  };
+
+  const formatarTempo = (dataString) => {
+    if (!dataString) return '';
+    const data = new Date(dataString);
+    // Formata para 14:30 ou 17/03 se não for hoje
+    return data.toLocaleDateString() === new Date().toLocaleDateString()
+      ? `${data.getHours()}:${data.getMinutes().toString().padStart(2, '0')}`
+      : `${data.getDate()}/${data.getMonth() + 1}`;
+  };
+
+  const getIcon = (tipo) => {
+    switch (tipo) {
+      case 'LEMBRETE':
+      case 'CONFIRMACAO': return 'calendar-outline';
+      case 'CANCELAMENTO': return 'close-circle-outline';
+      case 'AVALIACAO': return 'star-outline';
+      case 'APROVACAO': return 'checkmark-circle-outline';
+      case 'REJEICAO': return 'alert-circle-outline';
+      default: return 'information-circle-outline';
+    }
+  };
+
+  // O filtro agora usa o campo 'lida' que vem do Java (false = unread)
+  const filtered = notifications.filter((n) => (filter === 'naoLidas' ? !n.lida : true));
 
   return (
     <View style={styles.container}>
@@ -44,48 +98,53 @@ export default function NotificationsProfessionalScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {filtered.map((n) => (
-          <View key={n.id} style={styles.card}>
-            <View style={styles.left}>
-              <View style={[styles.iconWrap, n.unread && styles.iconWrapUnread]}>
-                <Ionicons name={icon(n.type)} size={20} color={n.unread ? '#007AFF' : '#666'} />
-              </View>
-            </View>
-
-            <View style={styles.body}>
-              <View style={styles.topRow}>
-                <Text style={styles.cardTitle}>{n.title}</Text>
-                <Text style={styles.time}>{n.time}</Text>
-              </View>
-              <Text style={styles.message}>{n.message}</Text>
-              {n.unread && <Text style={styles.unread}>Não lida</Text>}
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    {loading ? (
+      <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 40 }} />
+    ) : (
+      filtered.map((n) => (
+        <TouchableOpacity
+          key={n.id}
+          style={styles.card}
+          onPress={() => marcarComoLida(n.id, n.lida)}
+          activeOpacity={n.lida ? 1 : 0.7}
+        >
+          <View style={styles.left}>
+            <View style={[styles.iconWrap, !n.lida && styles.iconWrapUnread]}>
+              {/* Usamos getIcon(n.tipo) para bater com o Enum do Java */}
+              <Ionicons name={getIcon(n.tipo)} size={20} color={!n.lida ? '#007AFF' : '#666'} />
             </View>
           </View>
-        ))}
 
-        {filtered.length === 0 && (
-          <View style={styles.empty}>
-            <Ionicons name="notifications-off-outline" size={56} color="#C7C7CC" />
-            <Text style={styles.emptyTitle}>Sem notificações</Text>
-            <Text style={styles.emptySub}>Nenhuma notificação para mostrar.</Text>
+          <View style={styles.body}>
+            <View style={styles.topRow}>
+              {/* Batendo com o DTO: titulo, dataEnvio, mensagem */}
+              <Text style={styles.cardTitle}>{n.titulo}</Text>
+              <Text style={styles.time}>{formatarTempo(n.dataEnvio)}</Text>
+            </View>
+            <Text style={styles.message}>{n.mensagem}</Text>
+            {!n.lida && <Text style={styles.unread}>Nova</Text>}
           </View>
-        )}
-      </ScrollView>
+        </TouchableOpacity>
+      ))
+    )}
+
+    {!loading && filtered.length === 0 && (
+      <View style={styles.empty}>
+        <Ionicons name="notifications-off-outline" size={56} color="#C7C7CC" />
+        <Text style={styles.emptyTitle}>Sem notificações</Text>
+        <Text style={styles.emptySub}>Nenhuma notificação para mostrar.</Text>
+      </View>
+    )}
+  </ScrollView>
     </View>
   );
 }
 
+// Os estilos mantêm-se exatamente iguais aos seus!
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
-  header: {
-    backgroundColor: '#fff',
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
+  header: { backgroundColor: '#fff', paddingTop: 50, paddingBottom: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   title: { fontSize: 24, fontWeight: 'bold', color: '#333' },
   subtitle: { marginTop: 4, color: '#666' },
   filters: { flexDirection: 'row', backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 10 },
@@ -95,18 +154,7 @@ const styles = StyleSheet.create({
   filterTextActive: { color: '#fff' },
   scroll: { flex: 1 },
   content: { padding: 20, paddingBottom: 30 },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
-    flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+  card: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 12, flexDirection: 'row', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
   left: { marginRight: 12 },
   iconWrap: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F0F0F0', alignItems: 'center', justifyContent: 'center' },
   iconWrapUnread: { backgroundColor: '#F0F8FF' },

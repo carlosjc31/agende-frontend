@@ -149,7 +149,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
           <Text style={styles.subtitle}>{professional.specialty} • {professional.rating} ★</Text>
         </View>
 
-        <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Notificações')}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Notificações')}>
           <Ionicons name="notifications-outline" size={22} color="#fff" />
           <View style={styles.badgeDot} />
         </TouchableOpacity>
