@@ -1,531 +1,226 @@
 // screens/AppointmentsScreen.js
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  StatusBar,
-  ActivityIndicator
-} from 'react-native';
+import React, { useState, useCallback, useMemo } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
-import { consultaAPI } from '../../services/api';
+import api from '../../services/api';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function AppointmentsScreen({ navigation }) {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('proximas');
-  const [consultasReais, setConsultasReais] = useState([]);
+  const [consultas, setConsultas] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    carregarMinhasConsultas();
-  }, []);
+  // Controle das abas: 'proximas' ou 'historico'
+  const [activeTab, setActiveTab] = useState('proximas');
 
-  const carregarMinhasConsultas = async () => {
+  useFocusEffect(
+    useCallback(() => {
+      carregarConsultas();
+    }, [])
+  );
+
+  const carregarConsultas = async () => {
     try {
       setLoading(true);
-      const dados = await consultaAPI.listarPorPaciente(user.perfilId);
-      setConsultasReais(Array.isArray(dados) ? dados : (dados?.content || []));
+      // Puxa TODAS as consultas do paciente de uma vez só
+      const response = await api.get(`/consultas/paciente/${user.perfilId}`);
+      const dados = response.data;
+      const listaSegura = Array.isArray(dados) ? dados : (dados?.content || []);
+
+      // Ordena para que as mais recentes apareçam primeiro
+      listaSegura.sort((a, b) => new Date(b.dataConsulta) - new Date(a.dataConsulta));
+
+      setConsultas(listaSegura);
     } catch (error) {
-      console.log('Erro ao carregar histórico:', error);
-      setConsultasReais([]);
+      console.log("Erro ao buscar consultas do paciente:", error);
+      setConsultas([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const upcomingAppointments = consultasReais.filter(c => c.status === 'AGENDADA');
-  const pastAppointments = consultasReais.filter(c => c.status !== 'AGENDADA');
+  // Filtra as consultas dependendo da aba selecionada
+  const consultasListadas = useMemo(() => {
+    if (activeTab === 'proximas') {
+      return consultas.filter(c => c.status === 'AGENDADA' || c.status === 'CONFIRMADA' || c.status === 'PENDENTE');
+    } else {
+      return consultas.filter(c => c.status === 'REALIZADA' || c.status === 'CANCELADA' || c.status === 'FALTOU');
+    }
+  }, [consultas, activeTab]);
 
-  const handleCancelAppointment = (appointment) => {
-    Alert.alert(
-      'Cancelar Consulta',
-      `Deseja realmente cancelar a consulta com ${appointment.doctor}?`,
-      [
-        { text: 'Não', style: 'cancel' },
-        {
-          text: 'Sim, cancelar',
-          style: 'destructive',
-          onPress: () => {
-            Alert.alert('Sucesso', 'Consulta cancelada com sucesso');
-          },
-        },
-      ]
-    );
+  const formatarData = (dataString) => {
+    if (!dataString) return '';
+    const partes = dataString.split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
   };
 
-  const handleReschedule = (appointment) => {
-    navigation.navigate('Appointment', {
-      doctor: {
-        name: appointment.doctor,
-        specialty: appointment.specialty
-      }
-    });
+  const formatarHora = (horaString) => {
+    if (!horaString) return '';
+    return horaString.substring(0, 5);
   };
 
-  const handleJoinCall = (appointment) => {
-    Alert.alert(
-      'Telemedicina',
-      'A videochamada será iniciada. Certifique-se de estar em um local adequado.',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Iniciar Chamada',
-          onPress: () => {
-            // Iniciar videochamada
-            console.log('Iniciando videochamada...');
-          },
-        },
-      ]
-    );
-  };
-
-  const handleReview = (appointment) => {
-    Alert.alert(
-      'Avaliar Consulta',
-      `Avalie sua consulta com ${appointment.doctor}`,
-      [
-        { text: 'Agora não', style: 'cancel' },
-        {
-          text: 'Avaliar',
-          onPress: () => {
-            // Navegar para tela de avaliação
-            console.log('Abrir tela de avaliação');
-          },
-        },
-      ]
-    );
-  };
-
-  const getStatusColor = (status) => {
+  const statusColor = (status) => {
     switch (status) {
-      case 'confirmada':
-        return '#34C759';
-      case 'pendente':
-        return '#FF9500';
-      case 'concluida':
-        return '#007AFF';
-      case 'cancelada':
-        return '#FF3B30';
-      default:
-        return '#8E8E93';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status?.toUpperCase()) {
-      case 'AGENDADA':
-        return 'Confirmada';
-      case 'PENDENTE':
-        return 'Pendente';
-      case 'CONCLUIDA':
-      case 'REALIZADA':
-        return 'Concluída';
+      case 'CONFIRMADA': return '#34C759';
+      case 'AGENDADA': return '#FF9500';
       case 'CANCELADA':
-        return 'Cancelada';
-      default:
-        return status;
+      case 'FALTOU': return '#FF3B30';
+      case 'REALIZADA': return '#007AFF';
+      default: return '#8E8E93';
     }
   };
 
-  const renderAppointmentCard = (appointment, isPast = false) => (
-    <View key={appointment.id} style={styles.appointmentCard}>
-      <View style={styles.cardHeader}>
-        <View style={styles.doctorInfo}>
-          <View style={styles.avatarPlaceholder}>
-            <Ionicons name="person" size={24} color="#fff" />
-          </View>
-          <View style={styles.doctorDetails}>
-            <Text style={styles.doctorName}>{appointment.profissionalNome}</Text>
-            <Text style={styles.specialty}>{appointment.profissionalEspecialidade}</Text>
-          </View>
-        </View>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(appointment.status) }]}>
-          <Text style={styles.statusText}>{getStatusText(appointment.status)}</Text>
-        </View>
-      </View>
+  const renderConsulta = ({ item }) => {
+    const nomeMedico = item.profissional?.nomeCompleto || 'Médico não identificado';
+    const especialidade = item.profissional?.especialidade || 'Especialista';
+    const inicial = nomeMedico.charAt(0).toUpperCase();
 
-      <View style={styles.appointmentInfo}>
-        <View style={styles.infoRow}>
-          <Ionicons name="calendar-outline" size={18} color="#666" />
-          <Text style={styles.infoText}>{appointment.dataConsulta}</Text>
+    return (
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <View style={styles.medicoInfo}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{inicial}</Text>
+            </View>
+            <View>
+              <Text style={styles.medicoNome}>Dr(a). {nomeMedico}</Text>
+              <Text style={styles.medicoEspecialidade}>{especialidade}</Text>
+            </View>
+          </View>
+          <View style={[styles.statusPill, { backgroundColor: statusColor(item.status) }]}>
+            <Text style={styles.statusText}>{item.status}</Text>
+          </View>
         </View>
-        <View style={styles.infoRow}>
-          <Ionicons name="time-outline" size={18} color="#666" />
-          <Text style={styles.infoText}>{appointment.horaConsulta}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Ionicons
-            name={appointment.type === 'online' ? 'videocam-outline' : 'business-outline'}
-            size={18}
-            color="#666"
-          />
-          <Text style={styles.infoText}>
-            {appointment.type === 'online' ? 'Telemedicina' : 'Presencial'}
-          </Text>
-        </View>
-        {appointment.location && (
+
+        <View style={styles.cardBody}>
           <View style={styles.infoRow}>
-            <Ionicons name="location-outline" size={18} color="#666" />
-            <Text style={styles.infoText}>{appointment.profissionalHospital || 'Consultório Principal'}</Text>
+            <Ionicons name="calendar-outline" size={16} color="#666" />
+            <Text style={styles.infoText}>{formatarData(item.dataConsulta)}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="time-outline" size={16} color="#666" />
+            <Text style={styles.infoText}>{formatarHora(item.horaConsulta)}</Text>
+          </View>
+        </View>
+
+        {/* A MÁGICA DA RECEITA: Só aparece se estiver REALIZADA e tiver anotações! */}
+        {item.status === 'REALIZADA' && item.observacoes && (
+          <View style={styles.receitaContainer}>
+            <View style={styles.receitaHeader}>
+              <Ionicons name="document-text" size={16} color="#007AFF" />
+              <Text style={styles.receitaTitle}>Prescrição / Observações</Text>
+            </View>
+            <Text style={styles.receitaText}>{item.observacoes}</Text>
           </View>
         )}
       </View>
-
-      {!isPast && (
-        <View style={styles.cardActions}>
-          {appointment.type === 'online' && appointment.status === 'confirmada' && (
-            <TouchableOpacity
-              style={[styles.actionButton, styles.joinButton]}
-              onPress={() => handleJoinCall(appointment)}
-            >
-              <Ionicons name="videocam" size={18} color="#fff" />
-              <Text style={styles.actionButtonText}>Entrar na Chamada</Text>
-            </TouchableOpacity>
-          )}
-
-          <View style={styles.secondaryActions}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => handleReschedule(appointment)}
-            >
-              <Ionicons name="calendar-outline" size={18} color="#007AFF" />
-              <Text style={styles.secondaryButtonText}>Reagendar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => handleCancelAppointment(appointment)}
-            >
-              <Ionicons name="close-circle-outline" size={18} color="#FF3B30" />
-              <Text style={[styles.secondaryButtonText, { color: '#FF3B30' }]}>
-                Cancelar
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-
-      {isPast && appointment.canReview && !appointment.reviewed && (
-        <TouchableOpacity
-          style={styles.reviewButton}
-          onPress={() => handleReview(appointment)}
-        >
-          <Ionicons name="star-outline" size={18} color="#007AFF" />
-          <Text style={styles.reviewButtonText}>Avaliar Consulta</Text>
-        </TouchableOpacity>
-      )}
-
-      {isPast && appointment.reviewed && (
-        <View style={styles.reviewedBadge}>
-          <Ionicons name="checkmark-circle" size={16} color="#34C759" />
-          <Text style={styles.reviewedText}>Consulta avaliada</Text>
-        </View>
-      )}
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
 
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Minhas Consultas</Text>
       </View>
 
-      {/* Tabs */}
+      {/* ABAS VIRTUAIS */}
       <View style={styles.tabsContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'proximas' && styles.tabActive]}
+          style={[styles.tab, activeTab === 'proximas' && styles.activeTab]}
           onPress={() => setActiveTab('proximas')}
         >
-          <Text style={[styles.tabText, activeTab === 'proximas' && styles.tabTextActive]}>
-            Próximas ({upcomingAppointments.length})
-          </Text>
+          <Text style={[styles.tabText, activeTab === 'proximas' && styles.activeTabText]}>Próximas</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'historico' && styles.tabActive]}
+          style={[styles.tab, activeTab === 'historico' && styles.activeTab]}
           onPress={() => setActiveTab('historico')}
         >
-          <Text style={[styles.tabText, activeTab === 'historico' && styles.tabTextActive]}>
-            Histórico ({pastAppointments.length})
-          </Text>
+          <Text style={[styles.tabText, activeTab === 'historico' && styles.activeTabText]}>Histórico</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-      >
+      {/* LISTA DE CONSULTAS */}
       {loading ? (
-           <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 50 }} />
-        ) : (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>A carregar a sua agenda...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={consultasListadas}
+          keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
+          renderItem={renderConsulta}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="calendar-clear-outline" size={60} color="#CCC" />
+              <Text style={styles.emptyTitle}>Nenhuma consulta encontrada</Text>
+              <Text style={styles.emptyText}>
+                {activeTab === 'proximas'
+                  ? 'Você não tem consultas marcadas para os próximos dias.'
+                  : 'O seu histórico de consultas está vazio.'}
+              </Text>
 
-        <>
-        {activeTab === 'proximas' && upcomingAppointments.length > 0 && (
-          <>
-            {upcomingAppointments.map((appointment) =>
-              renderAppointmentCard(appointment, false)
-            )}
-          </>
-        )}
-
-        {activeTab === 'proximas' && upcomingAppointments.length === 0 && (
-          <View style={styles.emptyState}>
-            <Ionicons name="calendar-outline" size={64} color="#ccc" />
-            <Text style={styles.emptyTitle}>Nenhuma consulta agendada</Text>
-            <Text style={styles.emptyText}>
-              Que tal agendar uma consulta com um especialista?
-            </Text>
-            <TouchableOpacity
-              style={styles.emptyButton}
-              onPress={() => navigation.navigate('Search')}
-            >
-              <Text style={styles.emptyButtonText}>Buscar Médicos</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {activeTab === 'historico' && pastAppointments.length > 0 && (
-          <>
-            {pastAppointments.map((appointment) =>
-              renderAppointmentCard(appointment, true)
-            )}
-          </>
-        )}
-
-        {activeTab === 'historico' && pastAppointments.length === 0 && (
-          <View style={styles.emptyState}>
-            <Ionicons name="time-outline" size={64} color="#ccc" />
-            <Text style={styles.emptyTitle}>Nenhum histórico</Text>
-            <Text style={styles.emptyText}>
-              Suas consultas anteriores aparecerão aqui
-            </Text>
-          </View>
-        )}
-        </>
-        )}
-      </ScrollView>
+              {activeTab === 'proximas' && (
+                <TouchableOpacity
+                  style={styles.bookButton}
+                  onPress={() => navigation.navigate('SearchDoctorsScreen')}
+                >
+                  <Text style={styles.bookButtonText}>Agendar Nova Consulta</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#fff',
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 16,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  tabActive: {
-    borderBottomColor: '#007AFF',
-  },
-  tabText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  tabTextActive: {
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  appointmentCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  doctorInfo: {
-    flexDirection: 'row',
-    flex: 1,
-  },
-  avatarPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  doctorDetails: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  doctorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  specialty: {
-    fontSize: 14,
-    color: '#666',
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: '600',
-  },
-  appointmentInfo: {
-    marginBottom: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  infoText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#666',
-    flex: 1,
-  },
-  cardActions: {
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    paddingTop: 16,
-  },
-  joinButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#34C759',
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionButtonText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#fff',
-    fontWeight: '600',
-  },
-  secondaryActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  secondaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingVertical: 10,
-  },
-  secondaryButtonText: {
-    marginLeft: 6,
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '500',
-  },
-  reviewButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F0F8FF',
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#007AFF',
-  },
-  reviewButtonText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-  reviewedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-  },
-  reviewedText: {
-    marginLeft: 6,
-    fontSize: 14,
-    color: '#34C759',
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 40,
-  },
-  emptyButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-  },
-  emptyButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+  container: { flex: 1, backgroundColor: '#F5F5F5' },
+  header: { paddingTop: 50, paddingBottom: 15, paddingHorizontal: 20, backgroundColor: '#fff', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#EEE' },
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#333' },
+
+  // Estilos das Abas
+  tabsContainer: { flexDirection: 'row', backgroundColor: '#fff', paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#EEE' },
+  tab: { flex: 1, paddingVertical: 15, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
+  activeTab: { borderBottomColor: '#007AFF' },
+  tabText: { fontSize: 16, color: '#666', fontWeight: '500' },
+  activeTabText: { color: '#007AFF', fontWeight: 'bold' },
+
+  // Estilos da Lista
+  listContainer: { padding: 20, paddingBottom: 40 },
+  card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
+  medicoInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#E8F4FF', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  avatarText: { fontSize: 18, fontWeight: 'bold', color: '#007AFF' },
+  medicoNome: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+  medicoEspecialidade: { fontSize: 14, color: '#666', marginTop: 2 },
+  statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  statusText: { color: '#fff', fontSize: 11, fontWeight: 'bold' },
+  cardBody: { flexDirection: 'row', justifyContent: 'flex-start', borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 12 },
+  infoRow: { flexDirection: 'row', alignItems: 'center', marginRight: 24 },
+  infoText: { marginLeft: 6, fontSize: 14, color: '#444', fontWeight: '500' },
+
+  // Estilos da Receita / Observações
+  receitaContainer: { marginTop: 16, backgroundColor: '#F8F9FA', borderRadius: 8, padding: 12, borderWidth: 1, borderColor: '#E9ECEF' },
+  receitaHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
+  receitaTitle: { marginLeft: 6, fontSize: 14, fontWeight: 'bold', color: '#007AFF' },
+  receitaText: { fontSize: 14, color: '#444', lineHeight: 20, fontStyle: 'italic' },
+
+  // Estilos de Carregamento e Vazio
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { marginTop: 12, color: '#666', fontSize: 16 },
+  emptyContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 60, paddingHorizontal: 20 },
+  emptyTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginTop: 16, marginBottom: 8 },
+  emptyText: { fontSize: 15, color: '#666', textAlign: 'center', marginBottom: 24, lineHeight: 22 },
+  bookButton: { backgroundColor: '#007AFF', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 8 },
+  bookButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
 });
