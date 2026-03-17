@@ -8,8 +8,7 @@ import {
   KeyboardAvoidingView, Platform, Alert, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
-// Certifique-se de importar o axios/api caso o signUp do contexto não faça a chamada direta
-import { api } from '../../services/api';
+import  api  from '../../services/api';
 
 export default function SignUpScreen({ navigation }) {
   // Estado para controlar a aba ativa (Paciente ou Profissional)
@@ -124,8 +123,10 @@ export default function SignUpScreen({ navigation }) {
 
     } catch (error) {
       const erroDoBackend = error.response?.data;
-      console.log("ERRO DETALHADO DO BACKEND:", erroDoBackend);
-      Alert.alert('Erro ao Cadastrar', typeof erroDoBackend === 'string' ? erroDoBackend : 'Verifique os dados e tente novamente.');
+      console.log("MENSAGEM DE ERRO:", error.message);
+      console.log("STATUS CODE:", error.response?.status);
+      console.log("DADOS QUE TENTOU ENVIAR:", payload);
+      Alert.alert('Erro ao Cadastrar', 'Verifique o terminal do Expo para ver o erro.');
     } finally {
       setIsLoading(false);
     }
