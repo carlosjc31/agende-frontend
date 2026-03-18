@@ -20,6 +20,10 @@ export default function ProfessionalHomeScreen({ navigation }) {
   const [observacao, setObservacao] = useState('');
   const [processando, setProcessando] = useState(false);
 
+  // Estados das Estatísticas
+  const [ratingMedia, setRatingMedia] = useState(0);
+  const [totalAvaliacoes, setTotalAvaliacoes] = useState(0);
+
   useFocusEffect(
     useCallback(() => {
       carregarConsultas();
@@ -27,19 +31,28 @@ export default function ProfessionalHomeScreen({ navigation }) {
   );
 
   const carregarConsultas = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/consultas/profissional/${user.perfilId}`);
-      const dados = response.data;
-      const listaSegura = Array.isArray(dados) ? dados : (dados?.content || []);
-      setConsultasReais(listaSegura);
-    } catch (error) {
-      console.log("Erro ao buscar consultas da médica:", error);
-      setConsultasReais([]);
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    // Busca as consultas
+    const response = await api.get(`/consultas/profissional/${user.perfilId}`);
+    const lista = Array.isArray(response.data) ? response.data : (response.data?.content || []);
+    setConsultasReais(lista);
+
+    // BUSCA AS AVALIAÇÕES REAIS (Isso é o mais útil para o médico agora!)
+    const resAvaliacoes = await api.get(`/avaliacoes/profissional/${user.perfilId}`);
+    const avaliacoes = resAvaliacoes.data || [];
+
+    if (avaliacoes.length > 0) {
+      const soma = avaliacoes.reduce((acc, curr) => acc + curr.nota, 0);
+      setRatingMedia((soma / avaliacoes.length).toFixed(1));
+      setTotalAvaliacoes(avaliacoes.length);
     }
-  };
+  } catch (error) {
+    console.log("Erro ao carregar dados do dashboard:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const abrirModalAtendimento = (consulta) => {
     setConsultaAtual(consulta);
@@ -146,7 +159,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text style={styles.greeting}>Olá, {professional.name}</Text>
-          <Text style={styles.subtitle}>{professional.specialty} • {professional.rating} ★</Text>
+          <Text style={styles.subtitle}>{professional.specialty} • {professional.rating > 0 ? `${ratingMedia}★ (${totalAvaliacoes})`: 'Sem avaliação'} </Text>
         </View>
 
         <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Notificações')}>
@@ -298,7 +311,7 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { padding: 20, paddingBottom: 30 },
   statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: -28 },
-  statCard: { width: '23.5%', backgroundColor: '#fff', borderRadius: 12, paddingVertical: 12, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
+  statCard: { width: '23.5%', backgroundColor: '#fff', borderRadius: 12, paddingVertical: 25, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
   statNumber: { fontSize: 18, fontWeight: 'bold', color: '#333', marginTop: 6 },
   statLabel: { fontSize: 11, color: '#666', marginTop: 2 },
   actions: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 },

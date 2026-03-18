@@ -34,6 +34,7 @@ import ValidarProfissionalScreen from '../screens/admin/ValidarProfissionalScree
 import GerenciarPacientesScreen from '../screens/admin/GerenciarPacientesScreen';
 import GerenciarProfissionaisScreen from '../screens/admin/GerenciarProfissionaisScreen';
 import ConsultasDiaAdminScreen from '../screens/admin/ConsultasDiaAdminScreen';
+import AdminPatientsScreen from '../screens/admin/AdminPatientsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -138,6 +139,7 @@ function AdminRoutes() {
       <Stack.Screen name="GerenciarPacientes" component={GerenciarPacientesScreen} />
       <Stack.Screen name="GerenciarProfissionais" component={GerenciarProfissionaisScreen} />
       <Stack.Screen name="ConsultasDia" component={ConsultasDiaAdminScreen} />
+      <Stack.Screen name="AdminPatients" component={AdminPatientsScreen} options={{ title: 'Gerenciar Pacientes' }} />
     </Stack.Navigator>
   );
 }

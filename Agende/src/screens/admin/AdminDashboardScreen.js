@@ -2,10 +2,12 @@
 // TELA DASHBOARD DO ADMINISTRADOR
 // ============================================
 
-import React, { useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
+import api from '../../services/api';
 
 export default function AdminDashboardScreen({ navigation }) {
   const { signOut } = useAuth();
@@ -17,14 +19,39 @@ export default function AdminDashboardScreen({ navigation }) {
     ]);
   };
 
-  const stats = useMemo(
-    () => ({
-      profissionaisPendentes: 4,
-      pacientes: 128,
-      profissionais: 22,
-      consultasHoje: 19,
-    }),
-    []
+  // Dentro de AdminDashboardScreen
+  const [stats, setStats] = useState({
+    profissionaisPendentes: 0,
+    pacientes: 0,
+    profissionais: 0,
+    consultasHoje: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  const carregarDashboard = async () => {
+    try {
+      setLoading(true);
+      // Use a rota que retorna o seu DashboardStatsResponse
+      const response = await api.get('/admin/dashboard/stats');
+      const d = response.data;
+
+      setStats({
+        profissionaisPendentes: d.profissionaisPendentes || 0,
+        pacientes: d.totalPacientes || 0,
+        profissionais: d.totalProfissionais || 0,
+        consultasHoje: d.consultasHoje || 0,
+      });
+    } catch (error) {
+      console.log("Erro ao carregar dashboard admin:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarDashboard();
+    }, [])
   );
 
   const cards = [
