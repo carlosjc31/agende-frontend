@@ -85,6 +85,7 @@ function PatientRoutes() {
       <Stack.Screen name="Main" component={PatientTabs} />
       <Stack.Screen name="PatientNotifications" component={PatientNotificationsScreen} />
       <Stack.Screen name="Appointment" component={BookAppointmentScreen} />
+      <Tab.Screen name="ConsultaDetails" component={ConsultaDetailsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} />
     </Stack.Navigator>
   );
@@ -113,6 +114,7 @@ function ProfessionalTabs() {
       <Tab.Screen name="ProfHomeTab" component={ProfessionalHomeScreen} options={{ tabBarLabel: 'Início' }} />
       <Tab.Screen name="ProfessionalAgenda" component={AgendaScreen} options={{ tabBarLabel: 'Agenda' }} />
       <Tab.Screen name="ProfessionalConsultas" component={ConsultaScreen} options={{ tabBarLabel: 'Consultas' }} />
+
       <Tab.Screen name="ProfessionalProfile" component={ProfessionalProfileScreen} options={{ tabBarLabel: 'Perfil' }} />
     </Tab.Navigator>
   );
