@@ -21,30 +21,19 @@ export default function AdminDashboardScreen({ navigation }) {
 
   // Dentro de AdminDashboardScreen
   const [stats, setStats] = useState({
-    profissionaisPendentes: 0,
-    pacientes: 0,
-    profissionais: 0,
     consultasHoje: 0,
+    pendentes: 0,
+    totalPacientes: 0,
+    totalProfissionais: 0,
   });
-  const [loading, setLoading] = useState(true);
+
 
   const carregarDashboard = async () => {
     try {
-      setLoading(true);
-      // Use a rota que retorna o seu DashboardStatsResponse
       const response = await api.get('/admin/dashboard/stats');
-      const d = response.data;
-
-      setStats({
-        profissionaisPendentes: d.profissionaisPendentes || 0,
-        pacientes: d.totalPacientes || 0,
-        profissionais: d.totalProfissionais || 0,
-        consultasHoje: d.consultasHoje || 0,
-      });
+      setStats(response.data);
     } catch (error) {
       console.log("Erro ao carregar dashboard admin:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -73,13 +62,13 @@ export default function AdminDashboardScreen({ navigation }) {
         <View style={styles.kpis}>
           <View style={styles.kpiCard}>
             <Ionicons name="alert-circle-outline" size={22} color="#FF3B30" />
-            <Text style={styles.kpiNumber}>{stats.profissionaisPendentes}</Text>
+            <Text style={styles.kpiNumber}>{stats.pendentes}</Text>
             <Text style={styles.kpiLabel}>Pendentes</Text>
           </View>
 
           <View style={styles.kpiCard}>
             <Ionicons name="people-outline" size={22} color="#007AFF" />
-            <Text style={styles.kpiNumber}>{stats.pacientes}</Text>
+            <Text style={styles.kpiNumber}>{stats.totalPacientes}</Text>
             <Text style={styles.kpiLabel}>Pacientes</Text>
           </View>
 
