@@ -17,16 +17,21 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import {Ionicons} from '@expo/vector-icons';
+
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { signIn } = useAuth();
 
 const handleLogin = async () => {
+  setIsLoading(true);
   const result = await signIn(email, password);
+  setIsLoading(false);
   if (!result.success) {
     Alert.alert('Erro', result.message);
   }
@@ -35,6 +40,10 @@ const handleLogin = async () => {
 
   const handleSignUp = () => {
     navigation.navigate('SignUp');
+  };
+
+  const handleForgotPassword = () => {
+    navigation.navigate('ForgotPassword');
   };
 
   return (
@@ -50,7 +59,7 @@ const handleLogin = async () => {
         {/* Logo e Nome do App */}
         <View style={styles.logoContainer}>
           <Image
-
+            source={require('../../imagens/logo-consulta.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -76,16 +85,34 @@ const handleLogin = async () => {
             />
 
             <Text style={styles.label}>Senha</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite sua senha"
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              editable={!isLoading}
-            />
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Digite sua senha"
+                placeholderTextColor="#999"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                editable={!isLoading}
+              />
+
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+              disabled={isLoading}
+            >
+              <Ionicons
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={24} color="#999"
+              />
+            </TouchableOpacity>
+            </View>
+
+            {/* Esqueci minha senha */}
+            <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotContainer}>
+              <Text style={styles.forgotText}>Esqueci minha senha</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}
@@ -151,7 +178,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 40,
+    marginBottom: 30,
     textAlign: 'center',
   },
   form: {
@@ -172,6 +199,34 @@ const styles = StyleSheet.create({
     padding: 15,
     fontSize: 16,
     color: '#333',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 15,
+    fontSize: 16,
+    color: '#333',
+  },
+  eyeIcon: {
+    paddingHorizontal: 15,
+  },
+  // Estilo para o esqueci a senha
+  forgotContainer: {
+    alignItems: 'flex-end',
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  forgotText: {
+    color: '#007AFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   button: {
     backgroundColor: '#007AFF',

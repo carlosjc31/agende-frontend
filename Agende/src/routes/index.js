@@ -10,7 +10,8 @@ import { useAuth } from '../contexts/AuthContext'; // Importa useAuth do arquivo
 // --- IMPORTAÇÃO DAS TELAS DE AUTENTICAÇÃO ---
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
-
+import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
+import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 // --- IMPORTAÇÃO DAS TELAS DO PACIENTE ---
 import HomeScreen from '../screens/patient/HomeScreen';
 import SearchDoctorsScreen from '../screens/patient/SearchDoctorsScreen';
@@ -47,6 +48,13 @@ function AuthRoutes() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
+      {/* Telas de Recuperação de Senha */}
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen
+        name="ResetPassword"
+        component={ResetPasswordScreen}
+        options={{ headerShown: true, title: 'Criar Nova Senha' }} // Deixa o cabeçalho visível para o usuário conseguir voltar
+      />
     </Stack.Navigator>
   );
 }
