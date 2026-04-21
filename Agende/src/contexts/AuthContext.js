@@ -5,6 +5,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI } from '../services/api';
+import api from '../services/api';
 
 const AuthContext = createContext({});
 
@@ -13,9 +14,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    async function loadStorageData() {
+      // Força a limpeza total do celular!
+      //await AsyncStorage.clear(); deslogar o celular
+      // ----------------------------------------------------
+
+      const storageUser = await AsyncStorage.getItem('@agende:user');
+      const storageToken = await AsyncStorage.getItem('@agende:token');
+
+      if (storageUser && storageToken) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${storageToken}`;
+        setUser(JSON.parse(storageUser));
+      }
+      setLoading(false);
+    }
     loadStorageData();
   }, []);
-
+  // carrega os dados salvos no AsyncStorage quando o componente for montado
   async function loadStorageData() {
     try {
       const storedUser = await AsyncStorage.getItem('@agende:user');
@@ -30,33 +45,34 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   }
-
+  // Função de Login e Autenticação
   async function signIn(email, senha) {
     try {
-      console.log("PASSO 1: Chamando a API do Java...");
+      console.log("👉 1. Tentando logar com:", email);
       const response = await authAPI.login(email, senha);
-
-      console.log("PASSO 2: O Java respondeu!", response);
-
+      console.log("✅ 2. O Java autorizou! Pacote recebido:", response);
       const tokenReal = response.token || response.accessToken || (typeof response === 'string' ? response : null);
 
-      if (!tokenReal) {
-         throw new Error("Servidor não enviou um token válido.");
-      }
+      if (!tokenReal) throw new Error("Servidor não enviou um token válido.");
 
-      console.log("PASSO 3: Token real recebido. Guardando dados...");
+      api.defaults.headers.common['Authorization'] = `Bearer ${tokenReal}`;
 
+      const usuarioFormatado = {
+        response,
+        nomeCompleto: response.nomeCompleto || response.nome || null,
+        perfil: response.perfil || response.role || null,
+
+        perfilId: response.perfilId || response.profissionalId || response.idPerfil || response.id
+      };
+      console.log("🔄 3. Usuário formatado para o Routes:", usuarioFormatado);
       // Salva o tokenReal no AsyncStorage
-      setUser(response);
-      await AsyncStorage.setItem('@agende:user', JSON.stringify(response));
+      setUser(usuarioFormatado);
+      await AsyncStorage.setItem('@agende:user', JSON.stringify(usuarioFormatado));
       await AsyncStorage.setItem('@agende:token', tokenReal);
 
-      console.log("PASSO 4: Tudo pronto, redirecionando para a Home!");
       return { success: true };
 
     } catch (error) {
-      console.log("ERRO NO LOGIN DO JAVA:", error.response?.data || error.message);
-
       await AsyncStorage.multiRemove(['@agende:user', '@agende:token']);
       setUser(null);
 
@@ -65,24 +81,39 @@ export const AuthProvider = ({ children }) => {
   }
 
 // Função de Cadastro
-  const signUp = async (dadosPaciente) => {
+  const signUp = async (email, senha, perfil) => {
     try {
       // 1. Fazemos a chamada para a API
-      const response = await authAPI.registerPaciente(dadosPaciente);
+      const payload = { email, senha, perfil };
+      const response = await authAPI.registerPaciente(payload);
 
       if (response && response.token) {
         await AsyncStorage.setItem('@agende:token', response.token);
+        const newUser = { email: email, perfil: perfil, nomeCompleto: null};
+        setUser(newUser);
+        await AsyncStorage.setItem('@agende:user', JSON.stringify(newUser));
 
-      } else {
-
-        console.log("Cadastro realizado sem auto-login. Token não recebido.");
       }
 
       return { success: true };
     } catch (error) {
-      console.log("Erro no cadastro:", error);
+      console.log("Erro no cadastro:", error.response?.data || error.message);
 
-      throw error;
+      return { success: false, message: 'Não foi possível realizar o cadastro.'};
+    }
+  };
+
+  const completeProfile = async (dadosCompletos) => {
+    try {
+      await authAPI.completarPerfilPaciente(dadosCompletos);
+      const updatedUser = {user, nomeCompleto: dadosCompletos.nomeCompleto};
+      setUser(updatedUser);
+      await AsyncStorage.setItem('@agende:user', JSON.stringify(updatedUser));
+      return { success: true };
+
+    } catch (error) {
+      console.log("Erro ao completar perfil:", error);
+      return { success: false, message: 'Não foi possível salvar os dados.' };
     }
   };
 
@@ -103,6 +134,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         signIn,
         signUp,
+        completeProfile,
         signOut,
       }}
     >

@@ -84,7 +84,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
   // 1. Dados Reais da Médica
   const professional = useMemo(() => {
     return {
-      name: user?.nome || 'Doutor(a)',
+      name: user?.nomeCompleto || 'Doutor(a)',
       specialty: consultasReais?.length > 0 && consultasReais[0].profissional?.especialidade
                   ? consultasReais[0].profissional.especialidade
                   : 'Especialista',

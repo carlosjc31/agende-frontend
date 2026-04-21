@@ -16,7 +16,7 @@ import { consultaAPI } from '../../services/api';
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
-  const userName = user?.nome || user?.nome_completo || 'Paciente';
+  const userName = user?.nomeCompleto || 'Paciente';
 
   const [nextAppointment, setNextAppointment] = useState(null);
   const [recentDoctors, setRecentDoctors] = useState([]);

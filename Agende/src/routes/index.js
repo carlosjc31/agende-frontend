@@ -12,6 +12,9 @@ import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
 import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+import PatientOnboardingStep1 from '../screens/auth/PatientOnboardingStep1';
+import PatientOnboardingStep2 from '../screens/auth/PatientOnboardingStep2';
+
 // --- IMPORTAÇÃO DAS TELAS DO PACIENTE ---
 import HomeScreen from '../screens/patient/HomeScreen';
 import SearchDoctorsScreen from '../screens/patient/SearchDoctorsScreen';
@@ -39,6 +42,19 @@ import AdminPatientsScreen from '../screens/admin/AdminPatientsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+//===========================================
+// 1. ROTAS DE ONBOARDING (Deslogado)
+// ==========================================
+
+function PatientOnboardingRoutes(){
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="PatientOnboardingStep1" component={PatientOnboardingStep1} />
+      <Stack.Screen name="PatientOnboardingStep2" component={PatientOnboardingStep2} />
+    </Stack.Navigator>
+  );
+}
 
 // ==========================================
 // 1. ROTAS DE AUTENTICAÇÃO (Deslogado)
@@ -122,7 +138,6 @@ function ProfessionalTabs() {
       <Tab.Screen name="ProfHomeTab" component={ProfessionalHomeScreen} options={{ tabBarLabel: 'Início' }} />
       <Tab.Screen name="ProfessionalAgenda" component={AgendaScreen} options={{ tabBarLabel: 'Agenda' }} />
       <Tab.Screen name="ProfessionalConsultas" component={ConsultaScreen} options={{ tabBarLabel: 'Consultas' }} />
-
       <Tab.Screen name="ProfessionalProfile" component={ProfessionalProfileScreen} options={{ tabBarLabel: 'Perfil' }} />
     </Tab.Navigator>
   );
@@ -133,7 +148,7 @@ function ProfessionalRoutes() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Main" component={ProfessionalTabs} />
       <Stack.Screen name="Notificações" component={NotificationsProfessionalScreen} />
-      {/*<Stack.Screen name="ProfessionalNotifications" component={NotificationsProfessionalScreen} />*/}
+      <Stack.Screen name="ConsultaDetails" component={ConsultaDetailsScreen} />
     </Stack.Navigator>
   );
 }
@@ -168,6 +183,16 @@ export default function Routes() {
     );
   }
 
+  if (!signed){
+    return <AuthRoutes />
+  }
+  // Se o perfil vier vazio ou corrompido, chuta o usuário por segurança!
+  const isPacienteIncompleto = user?.perfil === 'PACIENTE' && !user?.nomeCompleto;
+
+  if (isPacienteIncompleto) {
+    return <PatientOnboardingRoutes />;
+  }
+  // Retorna as rotas de acordo com o perfil
   if (user?.perfil === 'ADMINISTRADOR') return <AdminRoutes />;
   if (user?.perfil === 'PROFISSIONAL') return <ProfessionalRoutes />;
   if (user?.perfil === 'PACIENTE') return <PatientRoutes />;

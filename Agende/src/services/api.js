@@ -61,6 +61,11 @@ export const authAPI = {
     const response = await api.post('/auth/register/paciente', data);
     return response.data;
   },
+  // Completar o perfil do Paciente, após o cadastro no passo 2
+  completarPerfilPaciente: async (dadosCompletos) => {
+    const response = await api.put('/auth/completar-perfil/paciente', dadosCompletos);
+    return response.data;
+  },
 };
 
 // ============================================
