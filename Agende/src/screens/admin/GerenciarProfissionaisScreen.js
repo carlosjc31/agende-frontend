@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, ActivityIndicator, Switch, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import api from '../../services/api';
+import api, { adminAPI } from '../../services/api';
 
 export default function AdminProfessionalsScreen({ navigation }) {
   const [medicos, setMedicos] = useState([]);
@@ -18,6 +18,27 @@ export default function AdminProfessionalsScreen({ navigation }) {
   };
 
   useEffect(() => { carregar(); }, []);
+
+  const handleToggleStatus = async (id, statusAtual) => {
+    // 1. Salva o estado original caso dê erro no Java
+    const estadoOriginal = statusAtual;
+
+    try {
+      // 2. Atualização Otimista: Muda o botão e o texto na tela instantaneamente!
+      setMedicos(medicos.map(m => m.id === id ? { ...m, ativo: !statusAtual } : m));
+
+      // 3. Avisa o Backend para atualizar no PostgreSQL
+      if (statusAtual === false) {
+        await adminAPI.ativar(id); // Se estava ativo, bloqueia
+      } else {
+        await adminAPI.rejeitar(id);  // Se estava bloqueado, ativa
+      }
+    } catch (error) {
+      console.log("Erro ao alterar status:", error);
+      // 4. Se a rede falhar, desfaz a animação e volta o botão
+      setMedicos(medicos.map(m => m.id === id ? { ...m, ativo: estadoOriginal } : m));
+    }
+  };
 
   const filtrados = medicos.filter(m =>
     m.nomeCompleto.toLowerCase().includes(busca.toLowerCase()) || m.crm.includes(busca)
@@ -41,7 +62,7 @@ export default function AdminProfessionalsScreen({ navigation }) {
         </Text>
         <Switch
           value={item.ativo}
-          onValueChange={() => {/* lógica de alternar status */}}
+          onValueChange={() => handleToggleStatus(item.id, item.ativo)}
           trackColor={{ false: "#767577", true: "#34C759" }}
         />
       </View>
@@ -68,7 +89,7 @@ export default function AdminProfessionalsScreen({ navigation }) {
         <Ionicons name="search" size={20} color="#999" />
         <TextInput
           style={styles.searchInput}
-          placeholder="Buscar por nome ou CRM..."
+          placeholder="Buscar por nome"
           value={busca}
           onChangeText={setBusca}
         />

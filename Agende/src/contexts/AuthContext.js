@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function loadStorageData() {
       // Força a limpeza total do celular!
-      //await AsyncStorage.clear(); deslogar o celular
+      await AsyncStorage.clear(); //deslogar o celular
       // ----------------------------------------------------
 
       const storageUser = await AsyncStorage.getItem('@agende:user');
@@ -52,11 +52,11 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.login(email, senha);
       console.log("✅ 2. O Java autorizou! Pacote recebido:", response);
       const tokenReal = response.token || response.accessToken || (typeof response === 'string' ? response : null);
-
+      // Verificação extra para garantir que temos um token válido
       if (!tokenReal) throw new Error("Servidor não enviou um token válido.");
-
+      // Configura o token para as próximas requisições
       api.defaults.headers.common['Authorization'] = `Bearer ${tokenReal}`;
-
+      // Formata o usuário
       const usuarioFormatado = {
         response,
         nomeCompleto: response.nomeCompleto || response.nome || null,
@@ -80,16 +80,22 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-// Função de Cadastro
+  // Função de Cadastro
   const signUp = async (email, senha, perfil) => {
     try {
       // 1. Fazemos a chamada para a API
       const payload = { email, senha, perfil };
-      const response = await authAPI.registerPaciente(payload);
-
+      let response;
+      // 2. Dependendo do perfil, chamamos a função de cadastro específica
+      if (perfil === 'PACIENTE') {
+        response = await authAPI.registerPaciente(payload);
+      } else if (perfil === 'PROFISSIONAL') {
+        response = await authAPI.registerProfissional(payload);
+      }
+      // 3. Se o cadastro for bem-sucedido, a API deve retornar um token (ou seja, já loga o usuário após o cadastro)
       if (response && response.token) {
         await AsyncStorage.setItem('@agende:token', response.token);
-        const newUser = { email: email, perfil: perfil, nomeCompleto: null};
+        const newUser = { id: response.id, email: email, perfil: perfil, nomeCompleto: null, perfilId: response.perfilId };
         setUser(newUser);
         await AsyncStorage.setItem('@agende:user', JSON.stringify(newUser));
 
@@ -102,7 +108,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: 'Não foi possível realizar o cadastro.'};
     }
   };
-
+  // Função para completar o perfil do paciente (usado no onboarding)
   const completeProfile = async (dadosCompletos) => {
     try {
       await authAPI.completarPerfilPaciente(dadosCompletos);
@@ -116,7 +122,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: 'Não foi possível salvar os dados.' };
     }
   };
-
+  // Função de Logout
   async function signOut() {
     try {
       await AsyncStorage.multiRemove(['@agende:user', '@agende:token']);
@@ -125,11 +131,12 @@ export const AuthProvider = ({ children }) => {
       console.error('Erro ao fazer logout:', error);
     }
   }
-
+  // Interceptador para lidar com erros de autenticação (token expirado, etc.)
   return (
     <AuthContext.Provider
       value={{
         signed: !!user,
+        setUser,
         user,
         loading,
         signIn,

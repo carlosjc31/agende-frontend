@@ -78,4 +78,4 @@ const styles = StyleSheet.create({
   button: { backgroundColor: '#007AFF', borderRadius: 8, padding: 16, alignItems: 'center', marginTop: 30, flexDirection: 'row', justifyContent: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
 });
-// Os estilos (styles) estão no final da próxima tela para você reaproveitar.
+

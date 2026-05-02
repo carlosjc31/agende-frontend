@@ -6,7 +6,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuração base da API
-const API_BASE_URL = 'http://192.168.0.3:8088/api'; // Alterar para IP do servidor em produção
+const API_BASE_URL = 'http://192.168.0.9:8088/api'; // Alterar para IP do servidor em produção
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -66,6 +66,17 @@ export const authAPI = {
     const response = await api.put('/auth/completar-perfil/paciente', dadosCompletos);
     return response.data;
   },
+
+  // Cadastro de Profissional
+  registerProfissional: async (data) => {
+    const response = await api.post('/auth/register/profissional', data);
+    return response.data;
+  },
+  // Completar perfil do profissional (usado no onboarding)
+  completarPerfilProfissional: async (dadosCompletos) => {
+    const response = await api.put('/auth/completar-perfil/profissional', dadosCompletos);
+    return response.data;
+  },
 };
 
 // ============================================
@@ -104,6 +115,7 @@ export const profissionalAPI = {
     const response = await api.get('/profissionais/top-avaliados');
     return response.data;
   },
+
 };
 
 // ============================================
@@ -218,6 +230,8 @@ export const adminAPI = {
     const response = await api.patch(`/profissionais/${id}/rejeitar`);
     return response.data;
   }
+
+  
 };
 
 export default api;

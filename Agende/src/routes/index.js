@@ -14,6 +14,7 @@ import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import PatientOnboardingStep1 from '../screens/auth/PatientOnboardingStep1';
 import PatientOnboardingStep2 from '../screens/auth/PatientOnboardingStep2';
+import ProfessionalOnboardingStep2 from '../screens/auth/ProfessionalOnboardingStep2';
 
 // --- IMPORTAÇÃO DAS TELAS DO PACIENTE ---
 import HomeScreen from '../screens/patient/HomeScreen';
@@ -46,12 +47,20 @@ const Tab = createBottomTabNavigator();
 //===========================================
 // 1. ROTAS DE ONBOARDING (Deslogado)
 // ==========================================
-
+// Se o paciente tiver cadastro incompleto, manda ele para as telas de onboarding
 function PatientOnboardingRoutes(){
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="PatientOnboardingStep1" component={PatientOnboardingStep1} />
       <Stack.Screen name="PatientOnboardingStep2" component={PatientOnboardingStep2} />
+    </Stack.Navigator>
+  );
+}
+// Se o profissional tiver cadastro incompleto, manda ele para as telas de onboarding (pode ser a mesma do paciente, ou uma específica para profissionais, dependendo de como você quiser organizar)
+function ProfessionalOnboardingRoutes(){
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ProfessionalOnboardingStep2" component={ProfessionalOnboardingStep2} />
     </Stack.Navigator>
   );
 }
@@ -173,7 +182,7 @@ function AdminRoutes() {
 // O GUARDA DE TRÂNSITO (Gerenciador Principal)
 // ==========================================
 export default function Routes() {
-  const { signed, user, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -183,15 +192,21 @@ export default function Routes() {
     );
   }
 
-  if (!signed){
+  if (!user) {
     return <AuthRoutes />
   }
-  // Se o perfil vier vazio ou corrompido, chuta o usuário por segurança!
+  // Verifica se o paciente tem cadastro incompleto (ou seja, se ele não completou o onboarding), e se tiver, manda ele completar o cadastro antes de acessar as rotas normais
   const isPacienteIncompleto = user?.perfil === 'PACIENTE' && !user?.nomeCompleto;
 
-  if (isPacienteIncompleto) {
-    return <PatientOnboardingRoutes />;
-  }
+  // Se o perfil do profissional estiver incompleto, manda ele completar o cadastro antes de acessar as rotas normais
+  const isProfissionalIncompleto = user?.perfil === 'PROFISSIONAL' && !user?.nomeCompleto;
+
+  // Se o paciente ou profissional tiver cadastro incompleto, manda ele para as telas de onboarding
+  if (isPacienteIncompleto) { return <PatientOnboardingRoutes />;}
+
+  // Se o profissional tiver cadastro incompleto, manda ele para as telas de onboarding (pode ser a mesma do paciente, ou uma específica para profissionais, dependendo de como você quiser organizar)
+  if (isProfissionalIncompleto) { return <ProfessionalOnboardingRoutes />;}
+
   // Retorna as rotas de acordo com o perfil
   if (user?.perfil === 'ADMINISTRADOR') return <AdminRoutes />;
   if (user?.perfil === 'PROFISSIONAL') return <ProfessionalRoutes />;
