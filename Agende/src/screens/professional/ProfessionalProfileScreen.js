@@ -92,7 +92,7 @@ export default function ProfessionalProfileScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#007AFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#95E1D3" />
 
       {/* CABEÇALHO COM DADOS REAIS */}
       <View style={styles.header}>
@@ -110,7 +110,7 @@ export default function ProfessionalProfileScreen({ navigation }) {
           </View>
 
           <TouchableOpacity style={styles.editBtn} onPress={openEditModal}>
-            <Ionicons name="create-outline" size={18} color="#fff" />
+            <Ionicons name="create-outline" size={18} color="#333" />
           </TouchableOpacity>
         </View>
       </View>
@@ -201,12 +201,12 @@ export default function ProfessionalProfileScreen({ navigation }) {
 // MANTENHA OS SEUS ESTILOS ORIGINAIS AQUI e ADICIONE os estilos do Modal abaixo:
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
-  header: { backgroundColor: '#007AFF', paddingTop: 50, paddingBottom: 18, paddingHorizontal: 20 },
+  header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 18, paddingHorizontal: 20 },
   topRow: { flexDirection: 'row', alignItems: 'center' },
   avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
   userInfo: { flex: 1, marginLeft: 14 },
-  name: { color: '#fff', fontSize: 18, fontWeight: '800' },
-  meta: { color: '#E8F4FF', marginTop: 3, fontSize: 12 },
+  name: { color: '#333', fontSize: 18, fontWeight: '800' },
+  meta: { color: '#333', marginTop: 3, fontSize: 12 },
   editBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   scroll: { flex: 1 },
   content: { padding: 20, paddingBottom: 30 },

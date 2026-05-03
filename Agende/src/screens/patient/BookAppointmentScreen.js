@@ -104,7 +104,7 @@ export default function BookAppointmentScreen({ navigation, route }) {
   // Renderização da tela de agendamento
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Informações do Médico */}
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   doctorCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#95E1D3',
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',

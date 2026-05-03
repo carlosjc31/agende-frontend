@@ -83,7 +83,7 @@ export default function NotificationsProfessionalScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
       <View style={styles.header}>
         <Text style={styles.title}>Notificações</Text>
         <Text style={styles.subtitle}>Atualizações e alertas</Text>
@@ -144,7 +144,7 @@ export default function NotificationsProfessionalScreen() {
 // Os estilos mantêm-se exatamente iguais aos seus!
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
-  header: { backgroundColor: '#fff', paddingTop: 50, paddingBottom: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   title: { fontSize: 24, fontWeight: 'bold', color: '#333' },
   subtitle: { marginTop: 4, color: '#666' },
   filters: { flexDirection: 'row', backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 10 },

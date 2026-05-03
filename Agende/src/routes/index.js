@@ -92,6 +92,12 @@ function PatientTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: '#4ECDC4', // 🎨 O fundo verde-água/ciano
+          borderTopWidth: 0,          // Remove a linha divisória superior da barra
+          elevation: 10,              // Adiciona uma sombra suave (Android)
+          shadowOpacity: 0.1,         // Sombra suave (iOS)
+        },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'HomeTab') iconName = focused ? 'home' : 'home-outline';
@@ -100,8 +106,8 @@ function PatientTabs() {
           else if (route.name === 'Profile') iconName = focused ? 'person' : 'person-outline';
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: '#FFFFFF', // 🎨 Ícone ativo fica totalmente branco
+        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.6)', // 🎨 Ícone inativo fica branco transparente
       })}
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Início' }} />

@@ -76,7 +76,7 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#007AFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#95E1D3" />
 
       <View style={styles.header}>
         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
@@ -136,7 +136,7 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#95E1D3',
     paddingTop: 50,
     paddingBottom: 16,
     paddingHorizontal: 16,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   back: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#fff', fontSize: 18, fontWeight: '800' },
+  headerTitle: { color: '#333', fontSize: 18, fontWeight: '800' },
   scroll: { flex: 1 },
   content: { padding: 20, paddingBottom: 30 },
   card: {

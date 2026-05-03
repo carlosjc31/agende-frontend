@@ -80,7 +80,7 @@ const carregarProfissionais = async () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: '#95E1D3',
     paddingTop: 50,
     paddingBottom: 16,
     paddingHorizontal: 20,

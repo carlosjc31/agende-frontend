@@ -80,7 +80,7 @@ export default function AdminPatientsScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
 
       {/* HEADER PADRONIZADO (Igual ao de Profissionais) */}
       <View style={styles.header}>
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 15,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#95E1D3',
     borderBottomWidth: 1,
     borderBottomColor: '#EEE',
     elevation: 2, // Sombra no Android

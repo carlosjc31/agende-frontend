@@ -51,7 +51,7 @@ export default function AgendaScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
 
       <View style={styles.header}>
         <Text style={styles.title}>Agenda</Text>
@@ -96,7 +96,7 @@ export default function AgendaScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: '#95E1D3',
     paddingTop: 50,
     paddingBottom: 16,
     paddingHorizontal: 20,

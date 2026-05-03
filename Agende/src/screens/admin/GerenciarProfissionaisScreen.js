@@ -71,7 +71,7 @@ export default function AdminProfessionalsScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
 
       {/* HEADER PADRONIZADO */}
       <View style={styles.header}>
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingTop: 50, paddingBottom: 15, paddingHorizontal: 20, backgroundColor: '#fff',
+    paddingTop: 50, paddingBottom: 15, paddingHorizontal: 20, backgroundColor: '#95E1D3',
     borderBottomWidth: 1, borderBottomColor: '#EEE'
   },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },

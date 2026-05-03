@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function loadStorageData() {
       // Força a limpeza total do celular!
-      await AsyncStorage.clear(); //deslogar o celular
+      //await AsyncStorage.clear(); //deslogar o celular
       // ----------------------------------------------------
 
       const storageUser = await AsyncStorage.getItem('@agende:user');

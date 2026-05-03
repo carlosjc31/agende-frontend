@@ -104,7 +104,7 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#007AFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#95E1D3" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -117,7 +117,7 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.userEmail}>{authUser?.email}</Text>
           </View>
           <TouchableOpacity style={styles.editButton} onPress={abrirModalEdicao}>
-            <Ionicons name="create-outline" size={24} color="#fff" />
+            <Ionicons name="create-outline" size={24} color="#333" />
           </TouchableOpacity>
         </View>
       </View>
@@ -229,12 +229,12 @@ export default function ProfileScreen({ navigation }) {
 // OS ESTILOS ORIGINAIS + OS ESTILOS DO MODAL
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-  header: { backgroundColor: '#007AFF', paddingTop: 50, paddingBottom: 20, paddingHorizontal: 20, marginBottom: 10 },
+  header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 20, paddingHorizontal: 20, marginBottom: 10 },
   profileSection: { flexDirection: 'row', alignItems: 'center' },
   avatarPlaceholder: { width: 70, height: 70, borderRadius: 35, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#fff' },
   avatarText: { fontSize: 30, fontWeight: 'bold', color: '#007AFF' },
   profileInfo: { flex: 1, marginLeft: 16 },
-  userName: { fontSize: 20, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
+  userName: { fontSize: 20, fontWeight: 'bold', color: '#333', marginBottom: 4 },
   userEmail: { fontSize: 14, color: '#E8F4FF' },
   editButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.2)', justifyContent: 'center', alignItems: 'center' },
   scrollView: { flex: 1 },

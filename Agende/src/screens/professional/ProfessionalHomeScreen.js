@@ -154,7 +154,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#007AFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#95E1D3" />
 
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -302,10 +302,10 @@ export default function ProfessionalHomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
-  header: { backgroundColor: '#007AFF', paddingTop: 50, paddingBottom: 18, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 18, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerLeft: { flex: 1, paddingRight: 12 },
-  greeting: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  subtitle: { color: '#E8F4FF', marginTop: 4, fontSize: 13 },
+  greeting: { color: '#333', fontSize: 20, fontWeight: 'bold' },
+  subtitle: { color: '#333', marginTop: 4, fontSize: 13 },
   iconButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   badgeDot: { position: 'absolute', top: 9, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF3B30' },
   scroll: { flex: 1 },

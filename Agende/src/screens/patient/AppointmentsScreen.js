@@ -175,7 +175,7 @@ export default function AppointmentsScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
+      <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Minhas Consultas</Text>
@@ -296,7 +296,7 @@ export default function AppointmentsScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
-  header: { paddingTop: 50, paddingBottom: 15, paddingHorizontal: 20, backgroundColor: '#fff', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#EEE' },
+  header: { paddingTop: 50, paddingBottom: 15, paddingHorizontal: 20, backgroundColor: '#95E1D3', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#EEE' },
   headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#333' },
   tabsContainer: { flexDirection: 'row', backgroundColor: '#fff', paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#EEE' },
   tab: { flex: 1, paddingVertical: 15, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },

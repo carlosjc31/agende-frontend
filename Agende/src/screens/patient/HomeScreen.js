@@ -77,7 +77,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
+      <StatusBar barStyle="light-content" backgroundColor="#95E1D3" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#95E1D3',
   },
   greeting: {
     fontSize: 24,
