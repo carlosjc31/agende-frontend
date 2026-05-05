@@ -71,7 +71,8 @@ export default function HomeScreen({ navigation }) {
     { id: 1, name: 'Cardiologia', icon: 'heart', color: '#FF6B6B' },
     { id: 2, name: 'Pediatria', icon: 'medkit', color: '#4ECDC4' },
     { id: 3, name: 'Ortopedia', icon: 'fitness', color: '#FFD93D' },
-    { id: 4, name: 'Dermatologia', icon: 'eye', color: '#95E1D3' },
+    { id: 4, name: 'Dermatologia', icon: 'body', color: '#95E1D3' },
+    { id: 5, name: 'Oftalmologia', icon: 'eye', color: '#1bcbe2' },
   ];
 
 

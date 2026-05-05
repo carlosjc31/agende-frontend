@@ -48,13 +48,14 @@ const handleLogin = async () => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+
       >
         {/* Logo e Nome do App */}
         <View style={styles.logoContainer}>
@@ -88,7 +89,7 @@ const handleLogin = async () => {
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Digite sua senha"
+                placeholder="   Digite sua senha"
                 placeholderTextColor="#999"
                 value={password}
                 onChangeText={setPassword}

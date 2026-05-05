@@ -13,24 +13,30 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
 // Importando a nossa API
 import { profissionalAPI } from '../../services/api';
 
-export default function SearchDoctorsScreen({ navigation }) {
+export default function SearchDoctorsScreen({ navigation, route }) {
+  const especialidadeInicial = route.params?.especialidade || 'Todas';
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSpecialty, setSelectedSpecialty] = useState('Todas');
+  const [selectedSpecialty, setSelectedSpecialty] = useState(especialidadeInicial);
   const [selectedFilter, setSelectedFilter] = useState('Todos');
 
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const specialties = ['Todas', 'Cardiologia', 'Pediatria', 'Ortopedia', 'Dermatologia'];
+  const specialties = ['Todas', 'Cardiologia', 'Pediatria', 'Ortopedia', 'Dermatologia', 'Oftalmologia'];
   const filters = ['Todos', 'Maior Avaliação', 'Mais Próximo', 'Menor Preço'];
 
   useEffect(() => {
+    if (route.params?.especialidade) {
+      setSelectedSpecialty(route.params.especialidade);
+    }
+  }, [route.params?.especialidade]);
+
+  useEffect(() => {
     carregarProfissionais();
-  }, []);
+  }, [selectedSpecialty, selectedFilter]);
 // Função para carregar os dados
 const carregarProfissionais = async () => {
     try {
