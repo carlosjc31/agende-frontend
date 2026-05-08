@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   doctorName: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 4, textAlign: 'center' },
   doctorSpecialty: { fontSize: 16, color: '#007AFF', marginBottom: 4 },
   doctorCrm: { fontSize: 14, color: '#999', marginBottom: 20 },
-  statsContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingTop: 20, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
+  statsContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
   statItem: { flex: 1, alignItems: 'center' },
   statValue: { fontSize: 16, fontWeight: 'bold', color: '#333', marginTop: 4 },
   statLabel: { fontSize: 12, color: '#666', marginTop: 2 },

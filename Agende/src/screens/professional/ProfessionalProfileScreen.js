@@ -123,11 +123,11 @@ export default function ProfessionalProfileScreen({ navigation }) {
             <Ionicons name="business-outline" size={20} color="#007AFF" />
             <Text style={styles.itemText}>Clínica: {profileData.hospitalClinica || 'Não informada'}</Text>
           </View>
-
+          {/*
           <View style={styles.item}>
             <Ionicons name="cash-outline" size={20} color="#007AFF" />
             <Text style={styles.itemText}>Valor da Consulta: R$ {profileData.valorConsulta ? profileData.valorConsulta.toFixed(2) : '0.00'}</Text>
-          </View>
+          </View>*/}
 
           <View style={styles.item}>
             <Ionicons name="call-outline" size={20} color="#007AFF" />

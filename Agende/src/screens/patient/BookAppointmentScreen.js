@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   doctorCard: {
     backgroundColor: '#95E1D3',
-    padding: 20,
+    padding: 40,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
@@ -471,7 +471,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: '#fff',
-    padding: 16,
+    paddingVertical: 40,
+    padding: 12,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
   },
