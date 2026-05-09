@@ -257,10 +257,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
            })
         )}
       </ScrollView>
-
-      {/* ========================================== */}
       {/* MODAL DE ATENDIMENTO MÉDICO                */}
-      {/* ========================================== */}
       <Modal visible={isModalVisible} animationType="slide" transparent={true} onRequestClose={() => setIsModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
