@@ -6,7 +6,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuração base da API
-const API_BASE_URL = 'http://192.168.0.15:8088/api'; // Alterar para IP do servidor em produção
+const API_BASE_URL = 'http://40.76.226.144:8080/api'; // Alterar para IP do servidor em produção
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -52,8 +52,15 @@ export const setupInterceptors = (signOutCallback) => {
 export const authAPI = {
   // Login
   login: async (email, senha) => {
-    const response = await api.post('/auth/login', { email, senha });
-    return response.data;
+    try {
+      console.log(`👉 1. Tentando logar com: ${email}`);
+      const response = await api.post('/auth/login', { email, senha });
+      console.log("👉 2. SUCESSO!", response.data);
+      return response.data;
+    } catch (error) {
+      console.log("❌ ERRO NO AXIOS:", error.message);
+      throw error;
+    }
   },
 
   // Cadastro de Paciente
