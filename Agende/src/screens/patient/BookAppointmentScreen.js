@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { consultaAPI } from '../../services/api';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function BookAppointmentScreen({ navigation, route }) {
   const { doctor } = route.params;
@@ -20,30 +21,22 @@ export default function BookAppointmentScreen({ navigation, route }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [appointmentType, setAppointmentType] = useState('presencial');
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Próximos 7 dias disponíveis
-  const generateDates = () => {
-    const dates = [];
-    const today = new Date();
-
-    for (let i = 1; i <= 7; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-
-      // Pula fins de semana
-      if (date.getDay() !== 0 && date.getDay() !== 6) {
-        dates.push({
-          day: date.getDate(),
-          month: date.toLocaleDateString('pt-BR', { month: 'short' }),
-          weekDay: date.toLocaleDateString('pt-BR', { weekday: 'short' }),
-          fullDate: date,
-        });
-      }
+  // Funções para selecionar data
+  const onChangeDate = (event, selected) => {
+    setShowDatePicker(false); // Esconde o calendário
+    if (selected) {
+      setSelectedDate({
+        day: String(selected.getDate()).padStart(2, '0'),
+        month: selected.toLocaleDateString('pt-BR', { month: 'short' }),
+        weekDay: selected.toLocaleDateString('pt-BR', { weekday: 'short' }),
+        fullDate: selected,
+      });
     }
-    return dates;
   };
 
-  const dates = generateDates();
+  //const dates = generateDates();
 
   const timeSlots = {
     morning: ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30'],
@@ -172,47 +165,31 @@ export default function BookAppointmentScreen({ navigation, route }) {
         {/* Seleção de Data */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Selecione a Data</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.datesScroll}
+                <TouchableOpacity
+            style={{
+              flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
+              padding: 16, borderRadius: 12, borderWidth: 2,
+              borderColor: selectedDate ? '#007AFF' : '#e0e0e0'
+            }}
+            onPress={() => setShowDatePicker(true)}
           >
-            {dates.map((date, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.dateCard,
-                  selectedDate?.day === date.day && styles.dateCardActive,
-                ]}
-                onPress={() => setSelectedDate(date)}
-              >
-                <Text
-                  style={[
-                    styles.weekDay,
-                    selectedDate?.day === date.day && styles.dateTextActive,
-                  ]}
-                >
-                  {date.weekDay}
-                </Text>
-                <Text
-                  style={[
-                    styles.day,
-                    selectedDate?.day === date.day && styles.dateTextActive,
-                  ]}
-                >
-                  {date.day}
-                </Text>
-                <Text
-                  style={[
-                    styles.month,
-                    selectedDate?.day === date.day && styles.dateTextActive,
-                  ]}
-                >
-                  {date.month}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+            <Ionicons name="calendar-outline" size={24} color={selectedDate ? '#007AFF' : '#666'} />
+            <Text style={{ marginLeft: 12, fontSize: 16, color: selectedDate ? '#007AFF' : '#666', fontWeight: selectedDate ? '600' : '400' }}>
+              {selectedDate
+                ? `${selectedDate.weekDay}, ${selectedDate.day} de ${selectedDate.month} de ${selectedDate.fullDate.getFullYear()}`
+                : 'Toque para abrir o calendário'}
+            </Text>
+          </TouchableOpacity>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate ? selectedDate.fullDate : new Date()}
+              mode="date"
+              display="default"
+              minimumDate={new Date()} // 👈 Impede de marcar consultas no passado!
+              onChange={onChangeDate}
+            />
+          )}
         </View>
 
         {/* Seleção de Horário */}

@@ -49,6 +49,34 @@ export default function AppointmentsScreen({ navigation }) {
     }
   };
 
+  // --- FUNÇÃO DE CANCELAMENTO ---
+  const confirmarCancelamento = (consultaId) => {
+    Alert.alert(
+      "Cancelar Consulta",
+      "Tem certeza que deseja cancelar esta consulta? Esta ação não pode ser desfeita.",
+      [
+        { text: "Voltar", style: "cancel" },
+        {
+          text: "Sim, Cancelar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await api.put(`/consultas/${consultaId}/cancelar`, {});
+              Alert.alert("Sucesso", "Sua consulta foi cancelada.");
+              carregarConsultas(); // Recarrega a lista para sumir com a consulta
+            } catch (error) {
+              console.error("Erro ao cancelar:", error);
+              Alert.alert("Erro", "Não foi possível cancelar a consulta no momento.");
+            } finally {
+              setLoading(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   useFocusEffect(
     useCallback(() => {
       carregarConsultas();
@@ -167,6 +195,15 @@ export default function AppointmentsScreen({ navigation }) {
             onPress={() => abrirModalAvaliacao(item)}
           >
             <Text style={styles.btnAvaliarText}>Avaliar Atendimento</Text>
+          </TouchableOpacity>
+        )}
+
+        {['AGENDADA', 'CONFIRMADA', 'PENDENTE'].includes(item.status) && (
+          <TouchableOpacity
+            style={[styles.btnAvaliarAcao, { borderColor: '#FF3B30', backgroundColor: '#FFEBEB' }]}
+            onPress={() => confirmarCancelamento(item.id)}
+          >
+            <Text style={[styles.btnAvaliarText, { color: '#FF3B30' }]}>Cancelar Consulta</Text>
           </TouchableOpacity>
         )}
       </View>
