@@ -6,7 +6,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuração base da API
-const API_BASE_URL = 'http://192.168.0.5:8088/api'; // Alterar para IP do servidor em produção
+const API_BASE_URL = 'http://40.76.226.144:8080/api'; // Alterar para IP do servidor em produção
 
 const api = axios.create({
   baseURL: API_BASE_URL,

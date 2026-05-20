@@ -87,7 +87,7 @@ export default function BookAppointmentScreen({ navigation, route }) {
               ]);
             } catch (error) {
               console.log('Erro ao agendar consulta:', error.response?.data || error.message);
-              Alert.alert('Erro', 'Não foi possível agendar a consulta. Tente novamente.');
+              Alert.alert('Atenção!', 'Horário indisponível para consulta. Por favor, escolha outro horário.');
             }
           },
         },
