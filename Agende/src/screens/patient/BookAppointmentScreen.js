@@ -87,7 +87,7 @@ export default function BookAppointmentScreen({ navigation, route }) {
               ]);
             } catch (error) {
               console.log('Erro ao agendar consulta:', error.response?.data || error.message);
-              Alert.alert('Erro', 'Não foi possível agendar a consulta. Tente novamente.');
+              Alert.alert('Atenção!', 'Horário indisponível para consulta. Por favor, escolha outro horário.');
             }
           },
         },
@@ -186,7 +186,7 @@ export default function BookAppointmentScreen({ navigation, route }) {
               value={selectedDate ? selectedDate.fullDate : new Date()}
               mode="date"
               display="default"
-              minimumDate={new Date()} // 👈 Impede de marcar consultas no passado!
+              minimumDate={new Date()} // Impede de marcar consultas no passado!
               onChange={onChangeDate}
             />
           )}

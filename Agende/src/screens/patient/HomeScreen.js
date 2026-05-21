@@ -68,7 +68,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   const specialties = [
-    { id: 1, name: 'Cardiologia', icon: 'heart', color: '#FF6B6B' },
+    { id: 1, name: 'Cardiologista', icon: 'heart', color: '#FF6B6B' },
     { id: 2, name: 'Pediatria', icon: 'medkit', color: '#4ECDC4' },
     { id: 3, name: 'Ortopedia', icon: 'fitness', color: '#FFD93D' },
     { id: 4, name: 'Dermatologia', icon: 'body', color: '#95E1D3' },

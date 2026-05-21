@@ -2,51 +2,127 @@
 // TELA DE AGENDA DO PROFISSIONAL
 // ============================================
 
-import React, { useMemo, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, StatusBar } from 'react-native';
+import React, { useMemo, useState, useCallback } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, StatusBar, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
+import api from '../../services/api';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function AgendaScreen() {
+  const { user } = useAuth();
   const [selectedDay, setSelectedDay] = useState('Hoje');
+  const [consultas, setConsultas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const days = useMemo(() => ['Hoje', 'Amanhã', 'Esta semana'], []);
-  const slots = useMemo(
-    () => ({
-      Hoje: [
-        { id: 's1', time: '08:00', status: 'disponível' },
-        { id: 's2', time: '08:30', status: 'bloqueado' },
-        { id: 's3', time: '09:00', status: 'reservado' },
-        { id: 's4', time: '09:30', status: 'disponível' },
-      ],
-      Amanhã: [
-        { id: 's5', time: '10:00', status: 'disponível' },
-        { id: 's6', time: '10:30', status: 'disponível' },
-        { id: 's7', time: '11:00', status: 'reservado' },
-      ],
-      'Esta semana': [
-        { id: 's8', time: '14:00', status: 'disponível' },
-        { id: 's9', time: '14:30', status: 'disponível' },
-        { id: 's10', time: '15:00', status: 'bloqueado' },
-      ],
-    }),
-    []
-  );
-
-  const color = (status) => {
-    switch (status) {
-      case 'disponível':
-        return '#34C759';
-      case 'reservado':
-        return '#FF9500';
-      case 'bloqueado':
-        return '#8E8E93';
-      default:
-        return '#007AFF';
+  const days = useMemo(() => ['Hoje', 'Amanhã', 'Proximas'], []);
+  // CARREGAMENTO DE DADOS DA AGENDA
+  const carregarAgenda = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/consultas/profissional/${user.perfilId}`);
+      const dados = response.data;
+      setConsultas(Array.isArray(dados) ? dados : (dados?.content || []));
+    } catch (error) {
+      console.log("Erro ao buscar consultas do profissional:", error);
+      Alert.alert('Erro', 'Nao foi possivel carregar as consultas.');
+    } finally {
+      setLoading(false);
     }
   };
-  // em breve
-  const toggleSlot = (slot) => {
-    Alert.alert('Ação', `Em breve: alterar status do horário ${slot.time} (${slot.status}).`);
+  // Atualiza a agenda ao entrar na tela
+  useFocusEffect(
+    useCallback(() => {
+      carregarAgenda();
+    }, [])
+  );
+  // Processa os dados da agenda
+  const slotsProcessados = useMemo(() => {
+    const grupos = {
+      'Hoje': [],
+      'Amanhã': [],
+      'Proximas': [],
+    };
+
+    // Função auxiliar para evitar bugs de fuso horário (formato YYYY-MM-DD)
+    const formatarData = (d) => {
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+    };
+
+    // Formatando as datas
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    // Dia seguinte
+    const amanha = new Date(hoje);
+    amanha.setDate(amanha.getDate() + 1);
+    // Proxima semana
+    const hojeStr = formatarData(hoje);
+    const amanhaStr = formatarData(amanha);
+
+
+    // Processando as consultas
+    consultas.forEach(consuta => {
+      if (!consuta.dataConsulta) return;
+      // Formatando a data
+      const data = consuta.dataConsulta;
+      // Formatando o horário
+      const slotFormatado = {
+        id: consuta.id,
+        time: consuta.horaConsulta ? consuta.horaConsulta.substring(0, 5) : '--:--',
+        status: consuta.status,
+        paciente: consuta.pacienteNome || 'Paciente não encontrado',
+        dataExibicao: consuta.dataConsulta.split('-').reverse().join('/'),
+      };
+      // Agrupando as consultas
+      if (data === hojeStr){
+        grupos['Hoje'].push(slotFormatado);
+      }else if (data === amanhaStr) {
+        grupos['Amanhã'].push(slotFormatado);
+      } else if (data > amanhaStr) {
+        grupos['Proximas'].push(slotFormatado);
+      }
+    });
+    grupos['Hoje'].sort((a, b) => a.time.localeCompare(b.time));
+    grupos['Amanhã'].sort((a, b) => a.time.localeCompare(b.time));
+
+    grupos['Proximas'].sort((a, b) => {
+      const dataA = a.dataExibicao.split('/').reverse().join('-');
+      const dataB = b.dataExibicao.split('/').reverse().join('-');
+      if (dataA === dataB) {
+        return a.time.localeCompare(b.time);
+      }
+      return dataA.localeCompare(dataB);
+    })
+
+    return grupos;
+  }, [consultas]
+);
+  // Cores dos status
+  const color = (status) => {
+    switch (status) {
+      case 'AGENDADA':
+        return '#007AFF';
+      case 'CONFIRMADA':
+        return '#34C759';
+      case 'CANCELADA':
+      case 'FALTOU':
+        return '#FF3B30';
+      case 'REALIZADA':
+        return '#8E8E93';
+      default:
+        return '#FF9500';
+    }
+  };
+  // Função para alternar o status da consulta
+  const acaoConsulta = (slot) => {
+    Alert.alert(
+      'Detalhes da Consulta',
+      `Paciente: ${slot.paciente}\nHorário: ${slot.time}\nStatus: ${slot.status}`,
+      [{ text: 'Fechar', style: 'cancel' }]
+    )
   };
 
   return (
@@ -54,8 +130,8 @@ export default function AgendaScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
 
       <View style={styles.header}>
-        <Text style={styles.title}>Agenda</Text>
-        <Text style={styles.subtitle}>Gerencie seus horários</Text>
+        <Text style={styles.title}>Minha Agenda</Text>
+        <Text style={styles.subtitle}>Acompanhe seus próximos atendimentos</Text>
       </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.daysScroll} contentContainerStyle={styles.daysContent}>
@@ -70,25 +146,40 @@ export default function AgendaScreen() {
         ))}
       </ScrollView>
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {slots[selectedDay].map((slot) => (
-          <TouchableOpacity key={slot.id} style={styles.slotCard} onPress={() => toggleSlot(slot)}>
-            <View style={styles.slotLeft}>
-              <Ionicons name="time-outline" size={20} color="#666" />
-              <Text style={styles.slotTime}>{slot.time}</Text>
-            </View>
-
-            <View style={[styles.statusPill, { backgroundColor: color(slot.status) }]}>
-              <Text style={styles.statusText}>{slot.status}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-
-        <View style={styles.hintCard}>
-          <Ionicons name="information-circle-outline" size={18} color="#007AFF" />
-          <Text style={styles.hintText}>Dica: toque em um horário para bloquear/liberar (placeholder).</Text>
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={{ marginTop: 10, color: '#666' }}>Carregando agenda...</Text>
         </View>
-      </ScrollView>
+      ) : (
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+          {slotsProcessados[selectedDay].length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="calendar-clear-outline" size={50} color="#CCC" />
+              <Text style={styles.emptyText}>Nenhuma consulta para este período.</Text>
+            </View>
+          ) : (
+            slotsProcessados[selectedDay].map((slot) => (
+              <TouchableOpacity key={slot.id} style={styles.slotCard} onPress={() => acaoConsulta(slot)}>
+                <View style={styles.slotLeft}>
+                  <Ionicons name="time-outline" size={24} color="#007AFF" />
+                  <View style={{ marginLeft: 12 }}>
+                    {selectedDay === 'Proximas' && (<Text style={{ fontSize: 12, color: '#007AFF', fontWeight: 'bold', marginBottom: 2 }}>{slot.dataExibicao}</Text>)}
+                    <Text style={styles.slotTime}>{slot.time}</Text>
+                    <Text style={styles.slotPaciente} numberOfLines={1}>{slot.paciente}</Text>
+                  </View>
+                </View>
+
+                <View style={[styles.statusPill, { backgroundColor: color(slot.status) }]}>
+                  <Text style={styles.statusText}>{slot.status}</Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+
+        </ScrollView>
+      )}
     </View>
   );
 }

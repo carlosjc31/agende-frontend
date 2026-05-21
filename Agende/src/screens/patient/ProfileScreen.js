@@ -63,7 +63,7 @@ export default function ProfileScreen({ navigation }) {
       setSaving(false);
     }
   };
-
+  // Funcionalidade de logout
   const handleLogout = () => {
     Alert.alert('Sair', 'Deseja realmente sair da sua conta?', [
       { text: 'Cancelar', style: 'cancel' },
@@ -185,39 +185,81 @@ export default function ProfileScreen({ navigation }) {
       {/* ========================================== */}
       {/* MODAL DE EDIÇÃO DE PERFIL DO PACIENTE      */}
       {/* ========================================== */}
-      <Modal visible={isEditModalVisible} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setIsEditModalVisible(false)}>
+      <Modal
+        visible={isEditModalVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setIsEditModalVisible(false)}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setIsEditModalVisible(false)}>
               <Text style={styles.cancelText}>Cancelar</Text>
             </TouchableOpacity>
+
             <Text style={styles.modalTitle}>Editar Perfil</Text>
+
             <TouchableOpacity onPress={salvarPerfil} disabled={saving}>
-              {saving ? <ActivityIndicator size="small" color="#007AFF" /> : <Text style={styles.saveText}>Salvar</Text>}
+              {saving ? (
+                <ActivityIndicator size="small" color="#007AFF" />
+              ) : (
+                <Text style={styles.saveText}>Salvar</Text>
+              )}
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
             <Text style={styles.label}>Telefone de Contato</Text>
-            <TextInput style={styles.input} placeholder="(00) 00000-0000" keyboardType="phone-pad" value={editForm.telefone} onChangeText={(text) => setEditForm({ ...editForm, telefone: text })} />
+            <TextInput
+              style={styles.input}
+              placeholder="(00) 00000-0000"
+              keyboardType="phone-pad"
+              value={editForm.telefone || ''}
+              onChangeText={(text) => setEditForm({ ...editForm, telefone: text })}
+            />
 
             <Text style={styles.label}>Cartão Nacional de Saúde (CNS)</Text>
-            <TextInput style={styles.input} placeholder="Apenas números" keyboardType="numeric" value={editForm.cns} onChangeText={(text) => setEditForm({ ...editForm, cns: text })} />
+            <TextInput
+              style={styles.input}
+              placeholder="Apenas números"
+              keyboardType="numeric"
+              value={editForm.cns || ''}
+              onChangeText={(text) => setEditForm({ ...editForm, cns: text })}
+            />
 
             <Text style={styles.label}>Endereço Completo</Text>
-            <TextInput style={styles.input} placeholder="Ex: Rua das Flores, 123" value={editForm.endereco} onChangeText={(text) => setEditForm({ ...editForm, endereco: text })} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: Rua das Flores, 123"
+              value={editForm.endereco || ''}
+              onChangeText={(text) => setEditForm({ ...editForm, endereco: text })}
+            />
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <View style={{ flex: 0.65, marginRight: 10 }}>
                 <Text style={styles.label}>Cidade</Text>
-                <TextInput style={styles.input} placeholder="Ex: São Paulo" value={editForm.cidade} onChangeText={(text) => setEditForm({ ...editForm, cidade: text })} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ex: São Paulo"
+                  value={editForm.cidade || ''}
+                  onChangeText={(text) => setEditForm({ ...editForm, cidade: text })}
+                />
               </View>
+
               <View style={{ flex: 0.35 }}>
                 <Text style={styles.label}>UF</Text>
-                <TextInput style={styles.input} placeholder="SP" maxLength={2} autoCapitalize="characters" value={editForm.estado} onChangeText={(text) => setEditForm({ ...editForm, estado: text })} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="SP"
+                  maxLength={2}
+                  autoCapitalize="characters"
+                  value={editForm.estado || ''}
+                  onChangeText={(text) => setEditForm({ ...editForm, estado: text })}
+                />
               </View>
             </View>
-            <View style={{ height: 40 }} /> {/* Espaço extra no final do scroll */}
+
+            <View style={{ height: 40 }} />
           </ScrollView>
         </View>
       </Modal>
