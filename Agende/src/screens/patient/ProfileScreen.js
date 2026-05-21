@@ -1,4 +1,4 @@
-// screens/ProfileScreen.js
+{/* screens/patient/ProfileScreen.js */}
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Switch, Alert, StatusBar, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,7 +55,7 @@ export default function ProfileScreen({ navigation }) {
       await api.put(`/pacientes/${authUser.perfilId}`, editForm);
       Alert.alert('Sucesso', 'Seus dados foram atualizados!');
       setIsEditModalVisible(false);
-      carregarPerfil(); // Puxa os dados novos
+      carregarPerfil();
     } catch (error) {
       console.log("Erro ao salvar perfil:", error);
       Alert.alert('Erro', 'Não foi possível atualizar o perfil.');
@@ -71,7 +71,7 @@ export default function ProfileScreen({ navigation }) {
     ]);
   };
 
-  // Menu mantido igual ao seu original
+  
   const menuSections = [
     {
       title: 'Minha Conta',
@@ -97,7 +97,7 @@ export default function ProfileScreen({ navigation }) {
     );
   }
 
-  // Dados mesclados para exibição segura
+  {/*Dados mesclados para exibição segura*/}
   const displayName = profileData?.nomeCompleto || profileData?.nome || authUser?.nome || 'Paciente';
   const displayPhone = profileData?.telefone || '(00) 00000-0000';
   const displayBlood = profileData?.tipoSanguineo || 'Não inf.';
@@ -163,7 +163,9 @@ export default function ProfileScreen({ navigation }) {
                   </View>
                   <View style={styles.menuItemRight}>
                     {item.badge && (
-                      <View style={styles.badge}><Text style={styles.badgeText}>{item.badge}</Text></View>
+                      <View style={styles.badge}>
+                        <Text style={styles.badgeText}>{item.badge}</Text>
+                      </View>
                     )}
                     <Ionicons name="chevron-forward" size={20} color="#ccc" />
                   </View>
@@ -186,6 +188,7 @@ export default function ProfileScreen({ navigation }) {
       {/* MODAL DE EDIÇÃO DE PERFIL DO PACIENTE      */}
       {/* ========================================== */}
       <Modal
+<<<<<<< HEAD
         visible={isEditModalVisible}
         animationType="slide"
         presentationStyle="pageSheet"
@@ -261,14 +264,91 @@ export default function ProfileScreen({ navigation }) {
 
             <View style={{ height: 40 }} />
           </ScrollView>
+=======
+  visible={isEditModalVisible}
+  animationType="slide"
+  presentationStyle="pageSheet"
+  onRequestClose={() => setIsEditModalVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalHeader}>
+      <TouchableOpacity onPress={() => setIsEditModalVisible(false)}>
+        <Text style={styles.cancelText}>Cancelar</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.modalTitle}>Editar Perfil</Text>
+
+      <TouchableOpacity onPress={salvarPerfil} disabled={saving}>
+        {saving ? (
+          <ActivityIndicator size="small" color="#007AFF" />
+        ) : (
+          <Text style={styles.saveText}>Salvar</Text>
+        )}
+      </TouchableOpacity>
+    </View>
+
+    <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
+      <Text style={styles.label}>Telefone de Contato</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="(00) 00000-0000"
+        keyboardType="phone-pad"
+        value={editForm.telefone || ''}
+        onChangeText={(text) => setEditForm({ ...editForm, telefone: text })}
+      />
+
+      <Text style={styles.label}>Cartão Nacional de Saúde (CNS)</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Apenas números"
+        keyboardType="numeric"
+        value={editForm.cns || ''}
+        onChangeText={(text) => setEditForm({ ...editForm, cns: text })}
+      />
+
+      <Text style={styles.label}>Endereço Completo</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ex: Rua das Flores, 123"
+        value={editForm.endereco || ''}
+        onChangeText={(text) => setEditForm({ ...editForm, endereco: text })}
+      />
+
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={{ flex: 0.65, marginRight: 10 }}>
+          <Text style={styles.label}>Cidade</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ex: São Paulo"
+            value={editForm.cidade || ''}
+            onChangeText={(text) => setEditForm({ ...editForm, cidade: text })}
+          />
+>>>>>>> e290afb4b27caea44e275a0172ea352c22936d71
         </View>
-      </Modal>
+
+        <View style={{ flex: 0.35 }}>
+          <Text style={styles.label}>UF</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="SP"
+            maxLength={2}
+            autoCapitalize="characters"
+            value={editForm.estado || ''}
+            onChangeText={(text) => setEditForm({ ...editForm, estado: text })}
+          />
+        </View>
+      </View>
+
+      <View style={{ height: 40 }} />
+    </ScrollView>
+  </View>
+</Modal>
 
     </View>
   );
 }
 
-// OS ESTILOS ORIGINAIS + OS ESTILOS DO MODAL
+{/*OS ESTILOS ORIGINAIS + OS ESTILOS DO MODAL*/}
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 20, paddingHorizontal: 20, marginBottom: 10 },
@@ -303,7 +383,7 @@ const styles = StyleSheet.create({
   logoutText: { marginLeft: 12, fontSize: 15, color: '#FF3B30', fontWeight: '600' },
   versionText: { textAlign: 'center', fontSize: 12, color: '#999', marginBottom: 32 },
 
-  // ESTILOS DO MODAL
+  
   modalContainer: { flex: 1, backgroundColor: '#F5F5F5' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#EEE' },
   modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
