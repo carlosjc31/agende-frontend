@@ -71,7 +71,7 @@ export default function ProfileScreen({ navigation }) {
     ]);
   };
 
-  
+
   const menuSections = [
     {
       title: 'Minha Conta',
@@ -188,7 +188,6 @@ export default function ProfileScreen({ navigation }) {
       {/* MODAL DE EDIÇÃO DE PERFIL DO PACIENTE      */}
       {/* ========================================== */}
       <Modal
-<<<<<<< HEAD
         visible={isEditModalVisible}
         animationType="slide"
         presentationStyle="pageSheet"
@@ -264,85 +263,8 @@ export default function ProfileScreen({ navigation }) {
 
             <View style={{ height: 40 }} />
           </ScrollView>
-=======
-  visible={isEditModalVisible}
-  animationType="slide"
-  presentationStyle="pageSheet"
-  onRequestClose={() => setIsEditModalVisible(false)}
->
-  <View style={styles.modalContainer}>
-    <View style={styles.modalHeader}>
-      <TouchableOpacity onPress={() => setIsEditModalVisible(false)}>
-        <Text style={styles.cancelText}>Cancelar</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.modalTitle}>Editar Perfil</Text>
-
-      <TouchableOpacity onPress={salvarPerfil} disabled={saving}>
-        {saving ? (
-          <ActivityIndicator size="small" color="#007AFF" />
-        ) : (
-          <Text style={styles.saveText}>Salvar</Text>
-        )}
-      </TouchableOpacity>
-    </View>
-
-    <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
-      <Text style={styles.label}>Telefone de Contato</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="(00) 00000-0000"
-        keyboardType="phone-pad"
-        value={editForm.telefone || ''}
-        onChangeText={(text) => setEditForm({ ...editForm, telefone: text })}
-      />
-
-      <Text style={styles.label}>Cartão Nacional de Saúde (CNS)</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Apenas números"
-        keyboardType="numeric"
-        value={editForm.cns || ''}
-        onChangeText={(text) => setEditForm({ ...editForm, cns: text })}
-      />
-
-      <Text style={styles.label}>Endereço Completo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ex: Rua das Flores, 123"
-        value={editForm.endereco || ''}
-        onChangeText={(text) => setEditForm({ ...editForm, endereco: text })}
-      />
-
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <View style={{ flex: 0.65, marginRight: 10 }}>
-          <Text style={styles.label}>Cidade</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: São Paulo"
-            value={editForm.cidade || ''}
-            onChangeText={(text) => setEditForm({ ...editForm, cidade: text })}
-          />
->>>>>>> e290afb4b27caea44e275a0172ea352c22936d71
         </View>
-
-        <View style={{ flex: 0.35 }}>
-          <Text style={styles.label}>UF</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="SP"
-            maxLength={2}
-            autoCapitalize="characters"
-            value={editForm.estado || ''}
-            onChangeText={(text) => setEditForm({ ...editForm, estado: text })}
-          />
-        </View>
-      </View>
-
-      <View style={{ height: 40 }} />
-    </ScrollView>
-  </View>
-</Modal>
+      </Modal>
 
     </View>
   );
@@ -383,7 +305,7 @@ const styles = StyleSheet.create({
   logoutText: { marginLeft: 12, fontSize: 15, color: '#FF3B30', fontWeight: '600' },
   versionText: { textAlign: 'center', fontSize: 12, color: '#999', marginBottom: 32 },
 
-  
+
   modalContainer: { flex: 1, backgroundColor: '#F5F5F5' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#EEE' },
   modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
