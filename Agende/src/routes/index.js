@@ -44,9 +44,8 @@ import AdminPatientsScreen from '../screens/admin/AdminPatientsScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-//===========================================
 // 1. ROTAS DE ONBOARDING (Deslogado)
-// ==========================================
+
 // Se o paciente tiver cadastro incompleto, manda ele para as telas de onboarding
 function PatientOnboardingRoutes(){
   return (
@@ -65,9 +64,8 @@ function ProfessionalOnboardingRoutes(){
   );
 }
 
-// ==========================================
-// 1. ROTAS DE AUTENTICAÇÃO (Deslogado)
-// ==========================================
+// ROTAS DE AUTENTICAÇÃO (Deslogado)
+
 function AuthRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -84,20 +82,20 @@ function AuthRoutes() {
   );
 }
 
-// ==========================================
-// 2. ROTAS DO PACIENTE (Bottom Tabs + Stack)
-// ==========================================
+// ROTAS DO PACIENTE (Bottom Tabs + Stack)
+
 function PatientTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#4ECDC4', // 🎨 O fundo verde-água/ciano
-          borderTopWidth: 0,          // Remove a linha divisória superior da barra
-          elevation: 10,              // Adiciona uma sombra suave (Android)
-          shadowOpacity: 0.1,         // Sombra suave (iOS)
+          backgroundColor: '#4ECDC4', // cor verde-água/ciano
+          borderTopWidth: 0,
+          elevation: 10,
+          shadowOpacity: 0.1,
         },
+        // barra de navegação do paciente com os 4 Ícones
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'HomeTab') iconName = focused ? 'home' : 'home-outline';
@@ -106,8 +104,8 @@ function PatientTabs() {
           else if (route.name === 'Profile') iconName = focused ? 'person' : 'person-outline';
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#FFFFFF', // 🎨 Ícone ativo fica totalmente branco
-        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.6)', // 🎨 Ícone inativo fica branco transparente
+        tabBarActiveTintColor: '#FFFFFF', // Ícone ativo fica totalmente branco
+        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.6)', // Ícone inativo fica branco transparente
       })}
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Início' }} />
@@ -117,7 +115,7 @@ function PatientTabs() {
     </Tab.Navigator>
   );
 }
-
+// Rotas do paciente (Home, Buscar, Consultas, Perfil)
 function PatientRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -130,9 +128,8 @@ function PatientRoutes() {
   );
 }
 
-// ==========================================
-// 3. ROTAS DO PROFISSIONAL
-// ==========================================
+// ROTAS DO PROFISSIONAL
+// Rotas do profissional (Home, Agenda, Consultas, Perfil)
 function ProfessionalTabs() {
   return (
     <Tab.Navigator
@@ -157,7 +154,7 @@ function ProfessionalTabs() {
     </Tab.Navigator>
   );
 }
-
+// Rotas do profissional
 function ProfessionalRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -168,9 +165,8 @@ function ProfessionalRoutes() {
   );
 }
 
-// ==========================================
-// 4. ROTAS DO ADMINISTRADOR
-// ==========================================
+// ROTAS DO ADMINISTRADOR
+
 function AdminRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -184,9 +180,9 @@ function AdminRoutes() {
   );
 }
 
-// ==========================================
-// O GUARDA DE TRÂNSITO (Gerenciador Principal)
-// ==========================================
+
+// Gerenciador Principal das rotas do app
+
 export default function Routes() {
   const { user, loading } = useAuth();
 
@@ -218,6 +214,6 @@ export default function Routes() {
   if (user?.perfil === 'PROFISSIONAL') return <ProfessionalRoutes />;
   if (user?.perfil === 'PACIENTE') return <PatientRoutes />;
 
-  // Se o perfil vier vazio ou corrompido, chuta o usuário por segurança!
+  // Se o perfil vier vazio ou corrompido, retorna as rotas de autenticação
   return <AuthRoutes />;
 }

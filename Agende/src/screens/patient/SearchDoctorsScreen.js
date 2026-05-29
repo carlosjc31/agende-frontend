@@ -1,4 +1,4 @@
-// screens/SearchDoctorsScreen.js
+// imporando bibliotecas
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -13,9 +13,9 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-// Importando a nossa API
 import { profissionalAPI } from '../../services/api';
 
+// Tela de busca de profissionais
 export default function SearchDoctorsScreen({ navigation, route }) {
   const especialidadeInicial = route.params?.especialidade || 'Todas';
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,12 +42,12 @@ const carregarProfissionais = async () => {
     try {
       setLoading(true);
 
-      // RASTREADOR 1: Garante que a função iniciou
+      // RASTREADOR: Garante que a função iniciou
       console.log("1. A iniciar a busca de médicos no IP da API...");
 
       const data = await profissionalAPI.listarTodos();
 
-      // RASTREADOR 2: Garante que o Java respondeu
+      // RASTREADOR: Garante que o Java respondeu
       console.log("2. O Java respondeu! Dados recebidos:", JSON.stringify(data, null, 2));
 
       if (Array.isArray(data)) {
@@ -61,7 +61,7 @@ const carregarProfissionais = async () => {
       }
 
     } catch (error) {
-      // RASTREADOR 3: Mostra se a chamada falhou (ex: Timeout ou Network Error)
+      // RASTREADOR: Mostra se a chamada falhou (ex: Timeout ou Network Error)
       console.log("3. Erro na ligação com o Java:", error.message);
       Alert.alert('Aviso', 'Não foi possível ligar ao servidor.');
       setDoctors([]);
@@ -70,7 +70,7 @@ const carregarProfissionais = async () => {
     }
   };
 
-  // CAMADA DE SEGURANÇA 2: Garante que doctors é sempre uma lista antes de filtrar
+  // CAMADA DE SEGURANÇA: Garante que doctors é sempre uma lista antes de filtrar
     const safeDoctors = Array.isArray(doctors) ? doctors : [];
 
     const filteredDoctors = safeDoctors.filter(doctor => {
@@ -233,7 +233,7 @@ const carregarProfissionais = async () => {
     </View>
   );
 }
-
+// Estilos da Tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,

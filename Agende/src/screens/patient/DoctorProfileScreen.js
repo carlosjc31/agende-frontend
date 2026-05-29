@@ -1,4 +1,4 @@
-// src/screens/patient/DoctorProfileScreen.js
+// importando bibliotecas
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
@@ -7,6 +7,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { profissionalAPI } from '../../services/api';
 
+// Tela de Perfil do Profissional
 export default function DoctorProfileScreen({ route, navigation }) {
 
   const { doctorId } = route.params;
@@ -30,7 +31,7 @@ export default function DoctorProfileScreen({ route, navigation }) {
     }
   };
 
-
+// carregar os detalhes do profissional
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -50,7 +51,7 @@ export default function DoctorProfileScreen({ route, navigation }) {
     rating: doctor.avaliacaoMedia || '5.0',
     price: doctor.valorConsulta ? `R$ ${doctor.valorConsulta}` : 'Sob Consulta',
   };
-
+// Tela de Perfil do Profissional
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
@@ -131,7 +132,7 @@ export default function DoctorProfileScreen({ route, navigation }) {
     </View>
   );
 }
-
+// Estilos da Tela
 const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' },
   loadingText: { marginTop: 12, color: '#666', fontSize: 16 },

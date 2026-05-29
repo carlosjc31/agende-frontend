@@ -1,3 +1,4 @@
+// importando bibliotecas
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -5,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// Tela de notificação do paciente
 export default function PatientNotificationsScreen() {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
@@ -15,15 +17,15 @@ export default function PatientNotificationsScreen() {
       carregarNotificacoes();
     }, [])
   );
-
+// carregar as notificações
   const carregarNotificacoes = async () => {
     try {
       setLoading(true);
-      // Usamos a mesma rota do Java: busca pelo usuarioId (ID de login)
+      // busca pelo usuarioId (ID de login)
       const response = await api.get(`/notificacoes/usuario/${user.id}`);
       const lista = Array.isArray(response.data) ? response.data : [];
 
-      // Ordena pelas mais recentes (dataEnvio que está no seu DTO)
+      // Ordena pelas mais recentes (dataEnvio que está no DTO)
       lista.sort((a, b) => new Date(b.dataEnvio) - new Date(a.dataEnvio));
       setNotifications(lista);
     } catch (error) {
@@ -32,7 +34,7 @@ export default function PatientNotificationsScreen() {
       setLoading(false);
     }
   };
-
+// marcar como lida
   const marcarComoLida = async (id, lida) => {
     if (lida) return;
     try {
@@ -42,7 +44,7 @@ export default function PatientNotificationsScreen() {
       console.log("Erro ao marcar lida:", error);
     }
   };
-
+// status da notificação
   const getIcon = (tipo) => {
     switch (tipo) {
       case 'CONFIRMACAO': return 'checkmark-done-circle-outline';
@@ -91,7 +93,7 @@ export default function PatientNotificationsScreen() {
     </View>
   );
 }
-
+// estilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: { backgroundColor: '#fff', paddingTop: 50, paddingBottom: 20, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#EEE' },

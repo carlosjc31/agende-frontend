@@ -1,7 +1,7 @@
-// ============================================
-// TELA DE CONSULTAS DO PROFISSIONAL
-// ============================================
 
+// TELA DE CONSULTAS DO PROFISSIONAL
+
+// importando bibliotecas
 import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { consultaAPI } from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// tela de consultas do profissional
 export default function ConsultaScreen({ navigation }) {
   const { user } = useAuth();
   const [tab, setTab] = useState('hoje');
@@ -20,7 +21,7 @@ export default function ConsultaScreen({ navigation }) {
     carregarConsultas();
   }, [])
   );
-
+// CARREGAMENTO DE DADOS DAS CONSULTAS
   const carregarConsultas = async () => {
     try {
       setLoading(true);
@@ -56,7 +57,7 @@ export default function ConsultaScreen({ navigation }) {
 
     return { hoje, proximas, historico };
   }, [consultasReais]);
-
+// status da consulta
   const statusColor = (status) => {
     switch (status?.toUpperCase()) {
       case 'AGENDADA': return '#34C759'; // Verde
@@ -137,7 +138,7 @@ export default function ConsultaScreen({ navigation }) {
     </View>
   );
 }
-
+// estilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {

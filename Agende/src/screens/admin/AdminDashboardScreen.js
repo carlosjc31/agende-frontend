@@ -1,7 +1,7 @@
-// ============================================
-// TELA DASHBOARD DO ADMINISTRADOR
-// ============================================
 
+// TELA DASHBOARD DO ADMINISTRADOR
+
+// importando bibliotecas
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,7 +19,7 @@ export default function AdminDashboardScreen({ navigation }) {
     ]);
   };
 
-  // Dentro de AdminDashboardScreen
+  // Dados reais puxados do Java
   const [stats, setStats] = useState({
     consultasHoje: 0,
     pendentes: 0,
@@ -27,7 +27,7 @@ export default function AdminDashboardScreen({ navigation }) {
     totalProfissionais: 0,
   });
 
-
+  // Função para carregar o dashboard
   const carregarDashboard = async () => {
     try {
       const response = await api.get('/admin/dashboard/stats');
@@ -43,13 +43,14 @@ export default function AdminDashboardScreen({ navigation }) {
     }, [])
   );
 
+  // Cards de ações para o admin
   const cards = [
     { id: 'v', title: 'Validar profissionais', subtitle: 'Cadastros pendentes', icon: 'shield-checkmark-outline', color: '#007AFF', go: 'ValidarProfissional' },
     { id: 'p', title: 'Gerenciar pacientes', subtitle: 'Lista e ações', icon: 'people-outline', color: '#34C759', go: 'GerenciarPacientes' },
     { id: 'pr', title: 'Gerenciar profissionais', subtitle: 'Lista e ações', icon: 'medkit-outline', color: '#FF9500', go: 'GerenciarProfissionais' },
     { id: 'c', title: 'Consultas do dia', subtitle: 'Acompanhar agenda', icon: 'calendar-outline', color: '#AF52DE', go: 'ConsultasDia' },
   ];
-
+  // design da tela do admin
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
@@ -110,7 +111,7 @@ export default function AdminDashboardScreen({ navigation }) {
     </View>
   );
 }
-
+// estilos da tela do admin
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {

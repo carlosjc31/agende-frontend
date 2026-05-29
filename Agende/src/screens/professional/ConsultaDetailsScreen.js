@@ -1,11 +1,13 @@
+// importando bibliotecas
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { consultaAPI } from '../../services/api';
 
+// Tela de detalhes da consulta
 export default function ConsultaDetailsScreen({ route, navigation }) {
   const { consulta } = route.params || {};
-
+// verificando se a consulta foi carregada
   if (!consulta) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -16,7 +18,7 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
       </View>
     );
   }
-
+// confirmando a consulta
   const handleConcluir = () => {
     Alert.alert(
       'Concluir Consulta',
@@ -63,8 +65,8 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
       ]
     );
   };
-
-      const statusColor = (status) => {
+// status da consulta
+  const statusColor = (status) => {
     switch (status?.toUpperCase()) {
       case 'AGENDADA': return '#34C759';
       case 'PENDENTE': return '#FF9500';
@@ -132,7 +134,7 @@ export default function ConsultaDetailsScreen({ route, navigation }) {
     </View>
   );
 }
-
+// estilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {

@@ -1,7 +1,7 @@
-// ============================================
-// TELA DE LOGIN - Integrada com API
-// ============================================
 
+// TELA DE LOGIN - Integrada com API
+
+//imporando bibliotecas
 import React, { useState } from 'react';
 import {
   View,
@@ -19,7 +19,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import {Ionicons} from '@expo/vector-icons';
 
-
+// função de login e autenticação
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,11 +37,11 @@ const handleLogin = async () => {
   }
 
 };
-
+// função de cadastro de usuários
   const handleSignUp = () => {
     navigation.navigate('SignUp');
   };
-
+// funcao de recuperação de senha
   const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword');
   };
@@ -139,7 +139,7 @@ const handleLogin = async () => {
     </KeyboardAvoidingView>
   );
 }
-
+// estilos da tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,

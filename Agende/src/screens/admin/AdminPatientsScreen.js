@@ -1,8 +1,10 @@
+// importando bibliotecas
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 
+// Tela de gerenciamento de pacientes para o administrador
 export default function AdminPatientsScreen() {
   const [pacientes, setPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function AdminPatientsScreen() {
     p.nomeCompleto.toLowerCase().includes(search.toLowerCase()) ||
     p.cpf.includes(search)
   );
-
+  // Renderização de cada Card
   const renderPaciente = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.avatar}>
@@ -45,7 +47,7 @@ export default function AdminPatientsScreen() {
       </TouchableOpacity>
     </View>
   );
-
+  // Interface de busca
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
@@ -72,7 +74,7 @@ export default function AdminPatientsScreen() {
     </View>
   );
 }
-
+// Estilos da tela de pacientes do admin
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   searchBar: { flexDirection: 'row', backgroundColor: '#fff', margin: 20, padding: 12, borderRadius: 10, alignItems: 'center', elevation: 2 },

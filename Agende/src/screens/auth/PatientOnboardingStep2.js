@@ -1,9 +1,11 @@
+// importando bibliotecas
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext'; // Ajuste o caminho
 import { maskCPF, maskPhone } from '../../utils/masks';
 
+// Tela 2 do onboarding do paciente
 export default function PatientOnboardingStep2({ route, navigation }) {
   // Recebendo os dados da Step1
   const { nomeCompleto, dataNascimento } = route.params;
@@ -13,8 +15,8 @@ export default function PatientOnboardingStep2({ route, navigation }) {
   const [telefone, setTelefone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { completeProfile } = useAuth(); // Precisaremos criar essa função no AuthContext
-
+  const { completeProfile } = useAuth();
+// campo cpf mascarado e formatado o telefone
   const handleFinish = async () => {
     const cpflimpo = cpf.replace(/\D/g, '');
     const telefonelimpo = telefone.replace(/\D/g, '');
@@ -27,8 +29,8 @@ export default function PatientOnboardingStep2({ route, navigation }) {
     setIsLoading(true);
     // Chama o contexto para enviar os dados para a sua API Spring Boot
     const result = await completeProfile({
-      nomeCompleto: nomeCompleto, // Nome que veio da tela 1
-      dataNascimento: dataNascimento,     // Data que veio da tela 1
+      nomeCompleto: nomeCompleto,
+      dataNascimento: dataNascimento,
       cpf: cpflimpo,
       cns: cns,
       telefone: telefonelimpo
@@ -39,7 +41,7 @@ export default function PatientOnboardingStep2({ route, navigation }) {
       Alert.alert('Erro', result.message || 'Não foi possível salvar os dados.');
     }
   };
-
+// tela de cadastro de pacientes - passo 2
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <ScrollView
@@ -88,7 +90,7 @@ export default function PatientOnboardingStep2({ route, navigation }) {
   );
 }
 
-// Estilos comuns para as duas telas
+// Estilos telas do onboarding
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 40, paddingHorizontal: 20 },

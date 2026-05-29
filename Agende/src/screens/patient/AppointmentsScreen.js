@@ -1,3 +1,4 @@
+// importando bibliotecas
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
@@ -16,6 +17,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// Tela de agendamentos do paciente
 export default function AppointmentsScreen({ navigation }) {
   const { user } = useAuth();
   const [consultas, setConsultas] = useState([]);
@@ -31,7 +33,7 @@ export default function AppointmentsScreen({ navigation }) {
   // Controle das abas: 'proximas' ou 'historico'
   const [activeTab, setActiveTab] = useState('proximas');
 
-  // --- CARREGAMENTO DE DADOS ---
+  // CARREGAMENTO DE DADOS da consulta
   const carregarConsultas = async () => {
     try {
       setLoading(true);
@@ -49,7 +51,7 @@ export default function AppointmentsScreen({ navigation }) {
     }
   };
 
-  // --- FUNÇÃO DE CANCELAMENTO ---
+  // CANCELAMENTO DE CONSULTA
   const confirmarCancelamento = (consultaId) => {
     Alert.alert(
       "Cancelar Consulta",
@@ -83,7 +85,7 @@ export default function AppointmentsScreen({ navigation }) {
     }, [])
   );
 
-  // --- FUNÇÕES DE AVALIAÇÃO ---
+  // FUNÇÕES DE AVALIAÇÃO
   const abrirModalAvaliacao = (consulta) => {
     setSelectedConsulta(consulta);
     setNota(5);
@@ -114,7 +116,7 @@ export default function AppointmentsScreen({ navigation }) {
     }
   };
 
-  // --- AUXILIARES E FILTROS ---
+  // AUXILIARES E FILTROS
   const consultasListadas = useMemo(() => {
     if (activeTab === 'proximas') {
       return consultas.filter(c => ['AGENDADA', 'CONFIRMADA', 'PENDENTE'].includes(c.status));
@@ -133,7 +135,7 @@ export default function AppointmentsScreen({ navigation }) {
     if (!horaString) return '';
     return horaString.substring(0, 5);
   };
-
+// status da aceição de aprovação
   const statusColor = (status) => {
     switch (status) {
       case 'CONFIRMADA': return '#34C759';
@@ -145,7 +147,7 @@ export default function AppointmentsScreen({ navigation }) {
     }
   };
 
-  // --- RENDERIZAÇÃO DE ITENS ---
+  // RENDERIZAÇÃO DE ITENS
   const renderConsulta = ({ item }) => {
     const nomeMedico = item.profissionalNome || 'Médico não identificado';
     const especialidade = item.profissionalEspecialidade || 'Especialista';
@@ -330,7 +332,7 @@ export default function AppointmentsScreen({ navigation }) {
     </View>
   );
 }
-
+// estilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: { paddingTop: 50, paddingBottom: 15, paddingHorizontal: 20, backgroundColor: '#95E1D3', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#EEE' },

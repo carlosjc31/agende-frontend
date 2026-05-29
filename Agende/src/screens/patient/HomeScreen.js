@@ -1,4 +1,4 @@
-// screens/HomeScreen.js
+// imporando bibliotecas
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { consultaAPI } from '../../services/api';
 
+// Tela de Home do Paciente
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
   const userName = user?.nomeCompleto || 'Paciente';
@@ -26,7 +27,7 @@ export default function HomeScreen({ navigation }) {
     carregarDadosIniciais();
   }, []);
 
-
+// carregar os dados iniciais
   const carregarDadosIniciais = async () => {
     try {
       setLoading(true);
@@ -66,7 +67,7 @@ export default function HomeScreen({ navigation }) {
       setLoading(false);
     }
   };
-
+// especialidades de medicos
   const specialties = [
     { id: 1, name: 'Cardiologista', icon: 'heart', color: '#FF6B6B' },
     { id: 2, name: 'Pediatria', icon: 'medkit', color: '#4ECDC4' },
@@ -75,7 +76,7 @@ export default function HomeScreen({ navigation }) {
     { id: 5, name: 'Oftalmologia', icon: 'eye', color: '#1bcbe2' },
   ];
 
-
+// renderiza a tela de home
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#95E1D3" />
@@ -225,7 +226,7 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 }
-
+// estilos da tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,

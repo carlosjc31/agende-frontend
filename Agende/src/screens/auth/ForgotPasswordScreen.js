@@ -1,3 +1,4 @@
+// imporando bibliotecas
 import React, { useState } from 'react';
 import {
   View,
@@ -22,9 +23,8 @@ export default function ForgotPasswordScreen({ navigation }) {
     }
 
     setIsLoading(true);
-
+// Simulando uma chamada de API
     try {
-      // Simulando uma chamada de API:
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       Alert.alert(
@@ -38,7 +38,7 @@ export default function ForgotPasswordScreen({ navigation }) {
       setIsLoading(false);
     }
   };
-
+// tela de recuperar senha
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
@@ -84,7 +84,7 @@ export default function ForgotPasswordScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
+// estilos da tela de recuperar senha
 const styles = StyleSheet.create({
   container: {
     flex: 1,

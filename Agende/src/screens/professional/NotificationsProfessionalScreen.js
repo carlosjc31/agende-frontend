@@ -1,3 +1,4 @@
+// importando bibliotecas
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -5,19 +6,19 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// Tela de notificações do profissional
 export default function NotificationsProfessionalScreen() {
   const { user } = useAuth();
   const [filter, setFilter] = useState('todas');
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Carrega as notificações sempre que a tela ganha foco
   useFocusEffect(
     useCallback(() => {
       carregarNotificacoes();
     }, [])
   );
-
+// carregar as notificações
   const carregarNotificacoes = async () => {
     try {
       setLoading(true);
@@ -65,7 +66,7 @@ export default function NotificationsProfessionalScreen() {
       ? `${data.getHours()}:${data.getMinutes().toString().padStart(2, '0')}`
       : `${data.getDate()}/${data.getMonth() + 1}`;
   };
-
+// status da notificação
   const getIcon = (tipo) => {
     switch (tipo) {
       case 'LEMBRETE':
@@ -78,7 +79,7 @@ export default function NotificationsProfessionalScreen() {
     }
   };
 
-  // O filtro agora usa o campo 'lida' que vem do Java (false = unread)
+  // O filtro agora usa o campo 'lida' para decidir se mostrar ou não
   const filtered = notifications.filter((n) => (filter === 'naoLidas' ? !n.lida : true));
 
   return (
@@ -141,7 +142,7 @@ export default function NotificationsProfessionalScreen() {
   );
 }
 
-// Os estilos mantêm-se exatamente iguais aos seus!
+// estilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 16, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },

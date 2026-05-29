@@ -1,24 +1,23 @@
-// ============================================
-// TELA DE VALIDAÇÃO DE PROFISSIONAIS (ADMIN)
-// ============================================
 
+// TELA DE VALIDAÇÃO DE PROFISSIONAIS (ADMIN)
+// importando bibliotecas
 import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, StatusBar, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { adminAPI } from '../../services/api';
 
+// Tela de validação de profissionais
 export default function ValidarProfissionalScreen() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //const pendingCount = items.filter((p) => p.status === 'pendente').length;
   useFocusEffect(
     useCallback(() => {
       carregarPendentes();
     }, [])
   );
-
+// Função para carregar os cadastros pendentes
   const carregarPendentes = async () => {
     try {
       setLoading(true);
@@ -31,7 +30,7 @@ export default function ValidarProfissionalScreen() {
       setLoading(false);
     }
   };
-
+// Funções de aprovação e rejeição
   const handleApprove = (id, nome) => {
     Alert.alert('Aprovar', `Deseja aprovar o cadastro de ${nome}?`, [
       { text: 'Cancelar', style: 'cancel' },
@@ -49,7 +48,7 @@ export default function ValidarProfissionalScreen() {
       },
     ]);
   };
-
+// Funções de aprovação e rejeição
   const handleReject = (id, nome) => {
     Alert.alert('Rejeitar', `Deseja realmente rejeitar e excluir o cadastro de ${nome}?`, [
       { text: 'Cancelar', style: 'cancel' },
@@ -68,7 +67,7 @@ export default function ValidarProfissionalScreen() {
       },
     ]);
   };
-
+// status da aceição de aprovação
   const statusColor = (status) => {
     switch (status) {
       case 'pendente':
@@ -81,7 +80,7 @@ export default function ValidarProfissionalScreen() {
         return '#8E8E93';
     }
   };
-
+// label do status de aprovação
   const statusLabel = (status) => {
     switch (status) {
       case 'pendente':
@@ -94,7 +93,7 @@ export default function ValidarProfissionalScreen() {
         return status;
     }
   };
-
+// telas de aprovação e rejeição de profissionais pendentes
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#95E1D3" />
@@ -156,7 +155,7 @@ export default function ValidarProfissionalScreen() {
     </View>
   );
 }
-
+// estilos da tela de aprovação
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
 

@@ -1,13 +1,15 @@
+// imporando bibliotecas
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 
+// Tela de consultas do dia
 export default function ConsultasDiaAdminScreen({ navigation }) {
   const [consultas, setConsultas] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Carregar as consultas de hoje
+  // Carregar as consultas de hoje
   const carregarConsultasHoje = async () => {
     try {
       setLoading(true);
@@ -24,7 +26,7 @@ export default function ConsultasDiaAdminScreen({ navigation }) {
   useEffect(() => {
     carregarConsultasHoje();
   }, []);
-
+// Detalhes da consulta do dia
   const getStatusColor = (status) => {
     switch (status) {
       case 'CONFIRMADA': return '#34C759';
@@ -35,7 +37,7 @@ export default function ConsultasDiaAdminScreen({ navigation }) {
     }
   };
 
-  // 2. O componente que será repetido para cada consulta
+  // O componente que será repetido para cada consulta
   const renderConsulta = ({ item }) => (
     <View style={styles.adminAppointmentCard}>
       <View style={styles.timeTag}>
@@ -50,7 +52,7 @@ export default function ConsultasDiaAdminScreen({ navigation }) {
       </View>
     </View>
   );
-
+// Tela de consultas do dia
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -81,7 +83,7 @@ export default function ConsultasDiaAdminScreen({ navigation }) {
     </View>
   );
 }
-
+// Estilos da tela de consultas do dia
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: {

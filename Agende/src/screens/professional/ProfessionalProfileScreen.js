@@ -1,4 +1,4 @@
-// screens/DoctorProfileScreen.js
+// importando bibliotecas
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Switch, StatusBar, Alert, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// Tela de Perfil do Profissional
 export default function ProfessionalProfileScreen({ navigation }) {
   const { user: authUser, signOut } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -160,9 +161,8 @@ export default function ProfessionalProfileScreen({ navigation }) {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* ========================================== */}
       {/* MODAL DE EDIÇÃO DE PERFIL                  */}
-      {/* ========================================== */}
+
       <Modal visible={isEditModalVisible} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setIsEditModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
@@ -198,7 +198,7 @@ export default function ProfessionalProfileScreen({ navigation }) {
   );
 }
 
-// MANTENHA OS SEUS ESTILOS ORIGINAIS AQUI e ADICIONE os estilos do Modal abaixo:
+// Stilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 18, paddingHorizontal: 20 },

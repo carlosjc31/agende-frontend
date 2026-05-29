@@ -1,14 +1,13 @@
-// ============================================
-// AUTH CONTEXT - Gerenciamento de Autenticação
-// ============================================
 
+// AUTH CONTEXT - Gerenciamento de Autenticação
+// importando bibliotecas
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI } from '../services/api';
 import api from '../services/api';
 
 const AuthContext = createContext({});
-
+// AuthProvider - Provedor de Autenticação
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       // Força a limpeza total do celular!
       //await AsyncStorage.clear(); //deslogar o celular
       // ----------------------------------------------------
-
+      // Carrega os dados salvos no AsyncStorage
       const storageUser = await AsyncStorage.getItem('@agende:user');
       const storageToken = await AsyncStorage.getItem('@agende:token');
 
@@ -64,7 +63,7 @@ export const AuthProvider = ({ children }) => {
 
         perfilId: response.perfilId || response.profissionalId || response.idPerfil || response.id
       };
-      console.log("🔄 3. Usuário formatado para o Routes:", usuarioFormatado);
+      //console.log("🔄 3. Usuário formatado para o Routes:", usuarioFormatado);
       // Salva o tokenReal no AsyncStorage
       setUser(usuarioFormatado);
       await AsyncStorage.setItem('@agende:user', JSON.stringify(usuarioFormatado));
@@ -80,19 +79,19 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  // Função de Cadastro
+  // Função de Cadastro do Usuário
   const signUp = async (email, senha, perfil) => {
     try {
-      // 1. Fazemos a chamada para a API
+      // Fazemos a chamada para a API
       const payload = { email, senha, perfil };
       let response;
-      // 2. Dependendo do perfil, chamamos a função de cadastro específica
+      // Dependendo do perfil, chamamos a função de cadastro específica
       if (perfil === 'PACIENTE') {
         response = await authAPI.registerPaciente(payload);
       } else if (perfil === 'PROFISSIONAL') {
         response = await authAPI.registerProfissional(payload);
       }
-      // 3. Se o cadastro for bem-sucedido, a API deve retornar um token (ou seja, já loga o usuário após o cadastro)
+      // Se o cadastro for bem-sucedido, a API deve retornar um token (ou seja, já loga o usuário após o cadastro)
       if (response && response.token) {
         await AsyncStorage.setItem('@agende:token', response.token);
         const newUser = { id: response.id, email: email, perfil: perfil, nomeCompleto: null, perfilId: response.perfilId };
@@ -122,7 +121,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: 'Não foi possível salvar os dados.' };
     }
   };
-  // Função de Logout
+  // Função de Logout do Usuário
   async function signOut() {
     try {
       await AsyncStorage.multiRemove(['@agende:user', '@agende:token']);

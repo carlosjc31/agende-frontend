@@ -1,8 +1,10 @@
+// importando bibliotecas
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { maskDate } from '../../utils/masks';
 
+// função principal da tela de cadastro de pacientes - passo 1
 export default function PatientOnboardingStep1({ navigation }) {
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [dataNascimento, setDataNascimento] = useState('');
@@ -19,7 +21,7 @@ export default function PatientOnboardingStep1({ navigation }) {
       dataNascimento
     });
   };
-
+// renderização da tela de cadastro de pacientes - passo 1
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <ScrollView
@@ -65,7 +67,7 @@ export default function PatientOnboardingStep1({ navigation }) {
     </KeyboardAvoidingView>
   );
 }
-
+// estilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 40, paddingHorizontal: 20 },

@@ -1,7 +1,6 @@
-// ============================================
 // TELA DE AGENDA DO PROFISSIONAL
-// ============================================
 
+// imporando bibliotecas
 import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, StatusBar, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// tela de agenda do profissional
 export default function AgendaScreen() {
   const { user } = useAuth();
   const [selectedDay, setSelectedDay] = useState('Hoje');
@@ -183,7 +183,7 @@ export default function AgendaScreen() {
     </View>
   );
 }
-
+// Estilos da Tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {

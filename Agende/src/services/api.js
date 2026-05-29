@@ -1,7 +1,6 @@
-// ============================================
 // API SERVICE - Integração com Backend
-// ============================================
 
+// importando bibliotecas
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -53,12 +52,12 @@ export const authAPI = {
   // Login
   login: async (email, senha) => {
     try {
-      console.log(`👉 1. Tentando logar com: ${email}`);
+      console.log(`1. Tentando logar com: ${email}`);
       const response = await api.post('/auth/login', { email, senha });
-      console.log("👉 2. SUCESSO!", response.data);
+      console.log("2. SUCESSO!", response.data);
       return response.data;
     } catch (error) {
-      console.log("❌ ERRO NO AXIOS:", error.message);
+      console.log("ERRO NO AXIOS:", error.message);
       throw error;
     }
   },
@@ -86,9 +85,8 @@ export const authAPI = {
   },
 };
 
-// ============================================
 // PROFISSIONAIS
-// ============================================
+
 
 export const profissionalAPI = {
   // Listar todos os profissionais
@@ -125,9 +123,7 @@ export const profissionalAPI = {
 
 };
 
-// ============================================
 // CONSULTAS
-// ============================================
 
 export const consultaAPI = {
   // Agendar consulta
@@ -174,9 +170,8 @@ export const consultaAPI = {
   },
 };
 
-// ============================================
+
 // AVALIAÇÕES
-// ============================================
 
 export const avaliacaoAPI = {
   // Avaliar consulta
@@ -192,9 +187,8 @@ export const avaliacaoAPI = {
   },
 };
 
-// ============================================
+
 // NOTIFICAÇÕES
-// ============================================
 
 export const notificacaoAPI = {
   // Listar todas as notificações
@@ -217,9 +211,7 @@ export const notificacaoAPI = {
 };
 
 
-// ============================================
 // Adminastrador de Usuários
-// ============================================
 
 export const adminAPI = {
   // Busca a lista de médicos esperando aprovação

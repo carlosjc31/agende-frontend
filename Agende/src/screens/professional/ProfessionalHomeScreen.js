@@ -1,7 +1,6 @@
-// ============================================
 // TELA HOME DO PROFISSIONAL
-// ============================================
 
+// importando bibliotecas
 import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, StatusBar, Modal, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// tela de home do profissional
 export default function ProfessionalHomeScreen({ navigation }) {
   const { user } = useAuth();
   const [consultasReais, setConsultasReais] = useState([]);
@@ -38,7 +38,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
     const lista = Array.isArray(response.data) ? response.data : (response.data?.content || []);
     setConsultasReais(lista);
 
-    // BUSCA AS AVALIAÇÕES REAIS (Isso é o mais útil para o médico agora!)
+    // BUSCA AS AVALIAÇÕES REAIS DO PROFISSIONAL
     const resAvaliacoes = await api.get(`/avaliacoes/profissional/${user.perfilId}`);
     const avaliacoes = resAvaliacoes.data || [];
 
@@ -65,14 +65,14 @@ export default function ProfessionalHomeScreen({ navigation }) {
 
     try {
       setProcessando(true);
-      // Chama a rota PATCH enviando as observações via Query Params (igual definimos no Java)
+      // Chama a rota PATCH enviando as observações via Query Params para o Java
       await api.patch(`/consultas/${consultaAtual.id}/marcar-realizada`, null, {
         params: { observacoes: observacao }
       });
 
       Alert.alert("Sucesso", "Atendimento finalizado com sucesso!");
       setIsModalVisible(false);
-      carregarConsultas(); // Recarrega a tela para atualizar as estatísticas
+      carregarConsultas();
     } catch (error) {
       console.log("Erro ao finalizar:", error);
       Alert.alert("Erro", "Não foi possível finalizar o atendimento.");
@@ -81,7 +81,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
     }
   };
 
-  // 1. Dados Reais da Médica
+  // Dados Reais da Médica
   const professional = useMemo(() => {
     return {
       name: user?.nomeCompleto || 'Doutor(a)',
@@ -92,7 +92,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
     };
   }, [user, consultasReais]);
 
-  // 2. Matemática Real das Estatísticas
+  // Matemática Real das Estatísticas
   const stats = useMemo(() => {
     if (!consultasReais || consultasReais.length === 0) {
       return { today: 0, week: 0, pending: 0, cancelled: 0, realized: 0 };
@@ -140,7 +140,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
     if (!horaString) return '';
     return horaString.substring(0, 5);
   };
-
+// status da aceição de aprovação
   const statusColor = (status) => {
     switch (status) {
       case 'CONFIRMADA': return '#34C759';
@@ -296,7 +296,7 @@ export default function ProfessionalHomeScreen({ navigation }) {
     </View>
   );
 }
-
+// stilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 18, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

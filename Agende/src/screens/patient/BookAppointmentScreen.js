@@ -1,4 +1,4 @@
-// screens/BookAppointmentScreen.js
+// imporando bibliotecas
 import React, { use, useState } from 'react';
 import {
   View,
@@ -14,6 +14,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { consultaAPI } from '../../services/api';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+// Tela de agendamento de consulta
 export default function BookAppointmentScreen({ navigation, route }) {
   const { doctor } = route.params;
   const { user } = useAuth();
@@ -36,8 +37,7 @@ export default function BookAppointmentScreen({ navigation, route }) {
     }
   };
 
-  //const dates = generateDates();
-
+// Funções para selecionar horário
   const timeSlots = {
     morning: ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30'],
     afternoon: ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30'],
@@ -280,7 +280,7 @@ export default function BookAppointmentScreen({ navigation, route }) {
     </View>
   );
 }
-
+// Estilos da tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,

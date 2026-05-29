@@ -1,3 +1,4 @@
+// importando bibliotecas
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
@@ -5,6 +6,7 @@ import { authAPI } from '../../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { maskPhone } from '../../utils/masks';
 
+// função principal da tela de cadastro de profissionais - passo 2
 export default function ProfessionalOnboardingStep2({ navigation }) {
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [crm, setCrm] = useState('');
@@ -12,7 +14,7 @@ export default function ProfessionalOnboardingStep2({ navigation }) {
   const [telefone, setTelefone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { user, setUser } = useAuth(); // Precisamos atualizar o usuário no contexto
+  const { user, setUser } = useAuth();
 
   const handleFinish = async () => {
     if (!nomeCompleto || !crm || !especialidade || !telefone) {
@@ -21,9 +23,8 @@ export default function ProfessionalOnboardingStep2({ navigation }) {
     }
 
     setIsLoading(true);
-
+// Completa o perfil do profissional
     try {
-      // 1. Monta o pacote de dados EXATAMENTE como o DTO do Java espera
       const dadosProfissional = {
         nomeCompleto: nomeCompleto,
         crm: crm,
@@ -31,10 +32,10 @@ export default function ProfessionalOnboardingStep2({ navigation }) {
         telefone: telefone.replace(/\D/g, '') // Envia apenas os números
       };
 
-      // 2. Chama a API para salvar o perfil do profissional
+      // Chama a API para salvar o perfil do profissional
       const response = await authAPI.completarPerfilProfissional(dadosProfissional);
 
-      // 3. Atualiza o Contexto do React Native com os novos dados do profissional
+      // Atualiza o Contexto do React Native com os novos dados do profissional
       const updatedUser = {
           ...user,
           nomeCompleto: dadosProfissional.nomeCompleto,
@@ -44,8 +45,6 @@ export default function ProfessionalOnboardingStep2({ navigation }) {
       setUser(updatedUser);
       await AsyncStorage.setItem('@agende:user', JSON.stringify(updatedUser));
 
-      // Não precisa dar navigation.navigate()! O Routes.js vai ouvir a mudança do 'user' e fazer a mágica.
-
     } catch (error) {
       console.log("Erro ao completar perfil do profissional:", error.response?.data || error);
       Alert.alert('Erro', 'Não foi possível salvar seus dados. Verifique sua conexão.');
@@ -53,7 +52,7 @@ export default function ProfessionalOnboardingStep2({ navigation }) {
       setIsLoading(false);
     }
   };
-
+// renderiza a tela de cadastro de profissionais - passo 2
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">

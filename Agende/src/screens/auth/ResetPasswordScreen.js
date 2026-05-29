@@ -1,8 +1,8 @@
+// importando bibliotecas
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import api from '../../services/api';
 
-
+// funcão ResetPasswordScreen que renderiza a tela de redefinição de senha
 export default function ResetPasswordScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [codigo, setCodigo] = useState('');
@@ -19,7 +19,6 @@ export default function ResetPasswordScreen({ navigation }) {
     try {
       // Exemplo de chamada pra sua API:
       // await authAPI.resetPassword(email, codigo, novaSenha);
-
       Alert.alert('Sucesso', 'Sua senha foi alterada! Faça login com a nova senha.', [
         { text: 'OK', onPress: () => navigation.navigate('Login') }
       ]);
@@ -29,7 +28,7 @@ export default function ResetPasswordScreen({ navigation }) {
       setIsLoading(false);
     }
   };
-
+// renderizando a tela de redefinição de senha
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Criar Nova Senha</Text>
@@ -49,7 +48,7 @@ export default function ResetPasswordScreen({ navigation }) {
     </View>
   );
 }
-
+// estilos da tela
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 30, backgroundColor: '#f5f5f5', justifyContent: 'center' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 30, textAlign: 'center' },

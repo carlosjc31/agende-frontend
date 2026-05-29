@@ -1,3 +1,4 @@
+// importando bibliotecas
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -14,12 +15,13 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// Tela de Gerenciamento de Pacientes para o Administrador
 export default function AdminPatientsScreen({ navigation }) {
   const [pacientes, setPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
 
-  // 1. Carregar os pacientes da API
+  // Carregar os pacientes da API
   const carregarPacientes = async () => {
     try {
       setLoading(true);
@@ -44,13 +46,13 @@ export default function AdminPatientsScreen({ navigation }) {
     }, [])
   );
 
-  // 2. Lógica de Busca (Filtro)
+  // Lógica de Busca (Filtro)
   const filtrados = pacientes.filter(p =>
     p.nomeCompleto.toLowerCase().includes(busca.toLowerCase()) ||
     p.cpf.includes(busca)
   );
 
-  // 3. Renderização de cada Card (Padronizado)
+  // Renderização de cada Card (Padronizado)
   const renderPaciente = ({ item }) => {
     const inicial = item.nomeCompleto.charAt(0).toUpperCase();
 
@@ -133,7 +135,7 @@ export default function AdminPatientsScreen({ navigation }) {
   );
 }
 
-// ESTILOS PADRONIZADOS (Reutilizando a estética de Profissionais)
+// styles padronizados para a tela de pacientes
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   header: {
@@ -146,8 +148,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#95E1D3',
     borderBottomWidth: 1,
     borderBottomColor: '#EEE',
-    elevation: 2, // Sombra no Android
-    shadowColor: '#000', // Sombra no iOS
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,

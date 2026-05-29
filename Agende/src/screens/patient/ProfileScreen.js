@@ -1,4 +1,4 @@
-{/* screens/patient/ProfileScreen.js */}
+//imporando bibliotecas
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Switch, Alert, StatusBar, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 
+// Tela de perfil do paciente
 export default function ProfileScreen({ navigation }) {
   const { signOut, user: authUser } = useAuth();
 
@@ -25,7 +26,7 @@ export default function ProfileScreen({ navigation }) {
       carregarPerfil();
     }, [])
   );
-
+// Funcionalidade de carregar o perfil
   const carregarPerfil = async () => {
     try {
       setLoading(true);
@@ -37,7 +38,7 @@ export default function ProfileScreen({ navigation }) {
       setLoading(false);
     }
   };
-
+// Funcionalidade de editar o perfil
   const abrirModalEdicao = () => {
     setEditForm({
       telefone: profileData?.telefone || '',
@@ -48,7 +49,7 @@ export default function ProfileScreen({ navigation }) {
     });
     setIsEditModalVisible(true);
   };
-
+// Funcionalidade de salvar as alterações
   const salvarPerfil = async () => {
     try {
       setSaving(true);
@@ -71,7 +72,7 @@ export default function ProfileScreen({ navigation }) {
     ]);
   };
 
-
+// Menu lateral de opções do perfil do paciente
   const menuSections = [
     {
       title: 'Minha Conta',
@@ -88,7 +89,7 @@ export default function ProfileScreen({ navigation }) {
       ],
     },
   ];
-
+// Tela de carregamento de dados
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -97,7 +98,7 @@ export default function ProfileScreen({ navigation }) {
     );
   }
 
-  {/*Dados mesclados para exibição segura*/}
+// Dados reais puxados do Java para o perfil
   const displayName = profileData?.nomeCompleto || profileData?.nome || authUser?.nome || 'Paciente';
   const displayPhone = profileData?.telefone || '(00) 00000-0000';
   const displayBlood = profileData?.tipoSanguineo || 'Não inf.';
@@ -184,9 +185,8 @@ export default function ProfileScreen({ navigation }) {
         <Text style={styles.versionText}>Agende v1.0.0</Text>
       </ScrollView>
 
-      {/* ========================================== */}
       {/* MODAL DE EDIÇÃO DE PERFIL DO PACIENTE      */}
-      {/* ========================================== */}
+
       <Modal
         visible={isEditModalVisible}
         animationType="slide"
@@ -270,7 +270,7 @@ export default function ProfileScreen({ navigation }) {
   );
 }
 
-{/*OS ESTILOS ORIGINAIS + OS ESTILOS DO MODAL*/}
+// Estilos da Tela
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   header: { backgroundColor: '#95E1D3', paddingTop: 50, paddingBottom: 20, paddingHorizontal: 20, marginBottom: 10 },

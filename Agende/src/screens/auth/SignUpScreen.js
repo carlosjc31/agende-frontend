@@ -1,18 +1,19 @@
-// ============================================
+
 // TELA DE CADASTRO - Integrada com API
-// ============================================
+// importando bibliotecas
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 
+// função de cadastro de usuários
 export default function SignUpScreen({ navigation }) {
   const [perfil, setPerfil] = useState('PACIENTE'); // Padrão é paciente
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // Para mostrar/ocultar senha
-  const { signUp } = useAuth(); // Sua função do contexto de autenticação
+  const [showPassword, setShowPassword] = useState(false);
+  const { signUp } = useAuth();
 
   const handleRegister = async () => {
     if (!email || !password) {
@@ -32,7 +33,7 @@ export default function SignUpScreen({ navigation }) {
       Alert.alert('Erro', result.message || 'Não foi possível cadastrar.');
     }
   };
-
+// tela de cadastro de usuários
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>

@@ -1,8 +1,10 @@
+// importando bibliotecas
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, ActivityIndicator, Switch, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import api, { adminAPI } from '../../services/api';
 
+// Tela de gerenciamento de profissionais
 export default function AdminProfessionalsScreen({ navigation }) {
   const [medicos, setMedicos] = useState([]);
   const [loading, setLoading] = useState(true);
